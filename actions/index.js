@@ -1,7 +1,6 @@
 import * as actionTypes from '../actions/actionTypes'
 
-
-// export const example = (example)=>({
-//   type: actionTypes.EXAMPLE,
-//   payload:example
-// })
+export const setUserDetails = (userDetails)=>({
+  type: actionTypes.SET_USER_DETAILS,
+  payload:userDetails
+})

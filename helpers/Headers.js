@@ -37,11 +37,14 @@ export default class Headers extends React.Component {
                 <SimpleLineIcons name={'menu'} size={22} color={'#fff'}/>
               </TouchableOpacity>
              </View>
-             <View style={{ flex: 0.8, flexDirection: 'row', justifyContent: 'center', alignItems: 'center',}}>
+             <View style={{ flex: this.props.screen=='Home'?0.6:0.8, flexDirection: 'row', justifyContent: 'center', alignItems: 'center',}}>
                <Text   style={{ color:'#fff',fontWeight:'700',fontSize:18,textAlign:'center',}} numberOfLines={1}>{this.props.name}</Text>
              </View>
-             <TouchableOpacity onPress={()=>{}} style={{ flex: 0.2, flexDirection: 'row', justifyContent: 'center', alignItems: 'center',}}>
-             </TouchableOpacity>
+             {this.props.screen=='Home'&&
+               <TouchableOpacity onPress={()=>{}} style={{ flex: 0.2, flexDirection: 'row', justifyContent: 'center', alignItems: 'center',}}>
+
+              </TouchableOpacity>
+           }
            </View>
        </View>
     )

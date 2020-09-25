@@ -17,7 +17,17 @@ const HttpsClient = {
          data:null,
          error:null
        }
-       await fetch(url).then((response) => {
+       var headers = {
+          "Cookie" :"csrf="+token.csrf+"; sessionid=" + token.sessionid +";",
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Referer': url,
+          'X-CSRFToken': token.csrf
+       }
+       await fetch(url,{
+         method:'GET',
+         headers: headers,
+       }).then((response) => {
          var status = response.status.toString()
          if(status.includes('20')){
             returnData.type='success'

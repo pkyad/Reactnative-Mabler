@@ -3,14 +3,14 @@ import React, { Component }  from 'react';
 import {ActivityIndicator, Alert, ScrollView, StyleSheet, View,StatusBar, Text, TextInput, Picker, TouchableHighlight,TouchableOpacity, ImageBackground, Image,AsyncStorage,Keyboard,Linking,PermissionsAndroid,ToastAndroid,Dimensions} from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import Constants from 'expo-constants';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome,MaterialCommunityIcons } from '@expo/vector-icons';
 import settings from '../appSettings';
 import * as Expo from 'expo';
 import * as Permissions from 'expo-permissions';
 
 
 const { width,height } = Dimensions.get('window');
-const url = settings.url
+const SERVER_URL = settings.url
 const themeColor = settings.themeColor
 
 class OtpScreen extends Component {
@@ -72,11 +72,13 @@ renderVerify=()=>{
 
 renderHeader=()=>{
   return(
-    <View style={{flexDirection: 'row',height:55,alignItems: 'center',}}>
-       <TouchableOpacity onPress={()=>this.props.navigation.goBack()} style={{ position:'absolute',left:0,top:0,bottom:0, justifyContent: 'center', alignItems: 'center',width:width*0.15,}}>
-         <MaterialIcons name={'keyboard-backspace'} size={30} color={'#000'} />
-       </TouchableOpacity>
- </View>
+    <View style={{height:55,width:width,backgroundColor:themeColor,marginTop:Constants.statusBarHeight}}>
+        <View style={{flexDirection: 'row',height:55,alignItems: 'center',}}>
+           <View style={{ flex:1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center',}}>
+             <Text   style={{ color:'#fff',fontWeight:'600',fontSize:22,textAlign:'center',}} numberOfLines={1}>Enter OTP</Text>
+           </View>
+         </View>
+     </View>
   )
 }
 
@@ -113,9 +115,8 @@ if(this.state.screen == 'login'){
 }else{
    var data = new FormData();
    data.append( "mobile", this.state.mobileNo );
-   fetch( SERVER_URL + '/api/homepage/registration/', {
-     method: 'POST',
-     body: data
+   fetch( SERVER_URL + '/api/homepage/registration/?mobile='+this.state.mobileNo, {
+     method: 'GET',
    })
    .then((response) =>{
      if(response.status == 200 || response.status==201 ){
@@ -141,12 +142,12 @@ showToast=(msg)=>{
 
 
 verify() {
-  var otp = this.state.otp
+  var otp = this.state.otp.join('')
 
- if(otp.length < 4){
-   this.showToast('Enter 4 digits OTP')
-   return
- }
+  if(otp.length < 4){
+     this.showToast('Enter 4 digits OTP')
+     return
+  }
  this.setState({loadingVisible:true})
   if(this.state.screen == 'login'){
    var data = new FormData();
@@ -174,7 +175,7 @@ verify() {
      AsyncStorage.setItem("csrf", responseJson.csrf_token)
      AsyncStorage.setItem("userpk", JSON.stringify(responseJson.pk))
      AsyncStorage.setItem("login", JSON.stringify(true)).then(res => {
-          return  this.props.navigation.navigate ('Home')
+          return  this.props.navigation.navigate ('Attendance')
      });
     return
    })
@@ -250,7 +251,7 @@ verify() {
         const txt = inputs.map(
             (i, j) => <View key={j} style={{paddingHorizontal:10}}>
                 <TextInput
-                    style={[ { height:40,width:40,borderWidth:1,borderColor:'#fff',borderRadius: 10,paddingHorizontal:15,color:'#fff' }]}
+                    style={[styles.shadow, { height:40,width:40,borderWidth:0,backgroundColor:'#fff',borderRadius: 0,paddingHorizontal:15,color:'#000' }]}
                     keyboardType="numeric"
                     selectionColor={'#ffffff'}
                     maxLength={1}
@@ -267,38 +268,31 @@ verify() {
      const {navigate} = this.props.navigation;
      if(!this.state.loader){
      return (
-        <View style={{flex:1,backgroundColor:'#fff'}}>
+        <View style={{flex:1,backgroundColor:'#e2e2e2'}}>
+
+          {this.renderHeader()}
 
            <View style={{flex:1,zIndex:2,}}>
                <View style={{flex:1}}>
-                 <View style={{flex:0.9,zIndex:2,alignItems:'center',justifyContent:'center'}}>
 
+               <View  style={{flex:0.5,justifyContent:'flex-end',backgroundColor:'#e2e2e2',borderWidth:0,alignItems:'center'}}>
+                 <Image source={require('../assets/man.png')} style={{resizeMode:'contain'}} />
+               </View>
 
-                   <View style={{marginVertical:15,alignItems:'center'}}>
-                      <Text style={{fontWeight: 'bold',fontSize: 25,color:'#000'}}> Enter OTP  </Text>
-                      <Text style={{fontSize: 14,color:'#000',marginTop:5}}> OTP has been sent to +91 {this.state.username} </Text>
-                   </View>
+                 <View style={{flex:0.4,zIndex:2,alignItems:'center',justifyContent:'center'}}>
 
-                   <View style={{marginHorizontal:30,width:width-60,marginVertical:15,}}>
-                     <View style={{position:'absolute',top:-9,left:20,zIndex:2,backgroundColor:'#fff'}}>
-                        <Text style={{fontSize:12,paddingHorizontal:5,color:'#000'}}>Enter OTP</Text>
-                     </View>
-                     <TextInput style={{height: 45,borderWidth:1,borderColor:'#000',width:'100%',borderRadius:10,color:'#000',paddingHorizontal:15}}
-                         placeholder=""
-                         selectionColor={'#000'}
-                         onChangeText={query => { this.setState({ otp: query });this.setState({ otp: query }) }}
-                         value={this.state.otp}
-                         keyboardType={'numeric'}
-                      />
+                     <View style={{marginHorizontal:30,width:width-60,marginVertical:15,flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
+                      {this.renderInputs()}
                     </View>
-                    <View style={{flexDirection:'row',marginTop:30}}>
+
+                    <View style={{flexDirection:'row',marginTop:15}}>
                       <Text style={{fontSize: 14,color:'#000',}}> {`Did't receive any code?`}</Text>
                       <TouchableOpacity style={{marginLeft:10}} onPress={()=>{this.resend()}}>
                         <Text style={{fontSize:16,fontWeight:'700',color:'#000',textDecorationLine: 'underline'}}>RESEND</Text>
                       </TouchableOpacity>
                     </View>
-                    <TouchableOpacity onPress={()=>{this.verify()}} style={{backgroundColor:themeColor,borderRadius:20,paddingVertical:8,paddingHorizontal:20,marginVertical:15}}>
-                      <Text style={{fontSize:16,color:'#fff',fontWeight:'700'}}>Login</Text>
+                    <TouchableOpacity onPress={()=>{this.verify()}} style={{backgroundColor:themeColor,borderRadius:20,height:50,width:50,alignItems:'center',justifyContent:'center',marginVertical:15,borderRadius:25}}>
+                       <MaterialCommunityIcons name="arrow-right" size={24} color="#fff" />
                     </TouchableOpacity>
                  </View>
               </View>
@@ -325,7 +319,16 @@ const styles = StyleSheet.create({
       paddingBottom:10,
       borderRadius:50,
   },
-
+  shadow:{
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0,
+    shadowRadius: 3.84,
+    elevation: 3,
+  },
   imgBackground: {
           width: '100%',
           height: '100%',

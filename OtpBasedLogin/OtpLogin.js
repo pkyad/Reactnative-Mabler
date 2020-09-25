@@ -76,10 +76,12 @@ export default  class OtpLogin extends Component {
        else{
          var data = new FormData();
          data.append( "mobile", this.state.mobileNo );
+         var sendData = {
+           mobile:this.state.mobileNo
+         }
          console.log(url + '/api/homepage/registration/');
-         fetch( url + '/api/homepage/registration/', {
-           method: 'POST',
-           body: data
+         fetch( url + '/api/homepage/registration/?mobile='+this.state.mobileNo, {
+           method: 'GET',
          }).then((response)=>{
            if(response.status == 200 || response.status==201 ){
              var d = response.json()
@@ -117,53 +119,62 @@ export default  class OtpLogin extends Component {
       if (this.state.mobileNo == undefined || mob.test(this.state.mobileNo) == false) {
          this.showToast('Enter Correct Mobile Number')
       }else {
-         this.showToast('OTP request sent')
+
          var data = await HttpsClient.get(url+'/generateOTP/?mobile='+this.state.mobileNo)
          if(data.type=='success'){
+             this.showToast('OTP request sent')
              this.props.navigation.navigate('OtpScreen',{screen:'LogInScreen',url:url,username:this.state.mobileNo,});
              return
          }else{
-             var register = await HttpsClient.post(url+'/api/homepage/registration/',{mobile:this.state.mobileNo,bodyType:'formData',login:true})
-             if(type=='success'){
-               this.setState({ userPk: register.data.pk,token:register.data.token,mobile:register.data.mobile,username:this.state.mobile });
-               this.props.navigation.navigate('OtpScreen',{
-                 username:this.state.mobileNo,
-                 screen:'',
-                 userPk:register.data.pk,
-                 token:register.data.token,
-                 mobile:register.data.mobileNo,
-                 csrf:register.data.csrf,
-                 url:url,
-                 mobileOTP:'',
-               });
-             }
+             this.showToast('Mobile is not registered.')
+             // this.getOtp()
+             // var register = await HttpsClient.post(url+'/api/homepage/registration/',{mobile:this.state.mobileNo,bodyType:'formData',login:true})
+             // if(register.type=='success'){
+             //   this.setState({ userPk: register.data.pk,token:register.data.token,mobile:register.data.mobile,username:this.state.mobile });
+             //   this.props.navigation.navigate('OtpScreen',{
+             //     username:this.state.mobileNo,
+             //     screen:'',
+             //     userPk:register.data.pk,
+             //     token:register.data.token,
+             //     mobile:register.data.mobileNo,
+             //     csrf:register.data.csrf,
+             //     url:url,
+             //     mobileOTP:'',
+             //   });
+             // }
          }
     }
+}
 
+renderHeader=()=>{
+  return(
+    <View style={{height:55,width:width,backgroundColor:themeColor,marginTop:Constants.statusBarHeight}}>
+        <View style={{flexDirection: 'row',height:55,alignItems: 'center',}}>
+           <View style={{ flex:1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center',}}>
+             <Text   style={{ color:'#fff',fontWeight:'600',fontSize:22,textAlign:'center',}} numberOfLines={1}>Enter Mobile</Text>
+           </View>
+         </View>
+     </View>
+  )
 }
 
   render(){
      const {navigate} = this.props.navigation;
      return (
-       <View style={{flex:1,backgroundColor:'#fff',}}>
+       <View style={{flex:1,backgroundColor:'#e2e2e2',}}>
+       {this.renderHeader()}
          <View style={{flex:1,zIndex:2,}}>
              <View style={{flex:1}}>
-               <View style={{flex:0.9,zIndex:2,alignItems:'center',justifyContent:'center'}}>
+                <View  style={{flex:0.5,justifyContent:'flex-end',backgroundColor:'#e2e2e2',borderWidth:0,alignItems:'center'}}>
+                  <Image source={require('../assets/man.png')} style={{resizeMode:'contain'}} />
+                </View>
+               <View style={{flex:0.4,zIndex:2,alignItems:'center',justifyContent:'center'}}>
 
-
-                 <View style={{marginVertical:15,alignItems:'center'}}>
-                    <Text style={{fontWeight: 'bold',fontSize: 25,color:'#000'}}> Welcome back ! </Text>
-                    <Text style={{fontSize: 14,color:'#000',marginTop:5}}> Great To See You Again </Text>
-                 </View>
-
-                 <View style={{marginHorizontal:30,width:width-60,marginVertical:15,}}>
-                   <View style={{position:'absolute',top:-9,left:20,zIndex:2,backgroundColor:'#fff'}}>
-                      <Text style={{fontSize:12,paddingHorizontal:5,color:'#000'}}>Enter your mobile no</Text>
-                   </View>
-                   <TextInput style={{height: 45,borderWidth:1,borderColor:'#000',width:'100%',borderRadius:10,color:'#000',paddingHorizontal:15}}
+                 <View style={{marginVertical:15,alignItems:'center',justifyContent:'center'}}>
+                   <TextInput style={{height: 45,borderBottomWidth:2,borderColor:'#c2c2c2',minWidth:width*0.4,maxWidth: width*0.8,borderRadius:0,color:'#000',fontSize:20,textAlign:'center'}}
                        placeholder=""
                        selectionColor={'#000'}
-                       onChangeText={query => { this.setState({ mobileNo: query });this.setState({ username: query }) }}
+                       onChangeText={query => {if(query.length==10){Keyboard.dismiss()}; this.setState({ mobileNo: query });this.setState({ username: query }) }}
                        value={this.state.username}
                        keyboardType={'numeric'}
                     />

@@ -12,6 +12,7 @@ const loginType = settings.loginType
 import Home from '../screens/Home';
 import PageFirst from '../screens/PageFirst';
 import PageSecond from '../screens/PageSecond';
+import Attendance from '../screens/Attendance';
 import OtpLogin from '../OtpBasedLogin/OtpLogin';
 import OtpScreen from '../OtpBasedLogin/OtpScreen';
 import DrawerContent from '../navigationComponents/DrawerContent';
@@ -64,12 +65,12 @@ const drawerNavigator = createDrawerNavigator({
       drawerLabel: () => null
     }
   },
-  Login:{
-    screen:loginType=='otp'?OtpLoginStack:OtpLoginStack,
-    navigationOptions:{
-      drawerLabel: () => null
-    }
-  },
+  // Login:{
+  //   screen:loginType=='otp'?OtpLoginStack:OtpLoginStack,
+  //   navigationOptions:{
+  //     drawerLabel: () => null
+  //   }
+  // },
 
   },
   {

@@ -41,13 +41,13 @@ class Home extends React.Component {
 
 
  componentDidMount(){
-    
+
  }
 
   render() {
     return (
-      <View style={{flex:1,}}>
-            <Headers navigation={this.props.navigation} name={'Home'} />
+      <View style={{flex:1,backgroundColor:'#e2e2e2'}}>
+            <Headers navigation={this.props.navigation} name={'mPower'}  screen={'Home'}/>
             <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
               <Text style={{color:'#000',fontSize:18}}>Home</Text>
             </View>
