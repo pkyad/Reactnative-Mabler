@@ -10,8 +10,10 @@ import settings from '../appSettings';
 const loginType = settings.loginType
 
 import Home from '../screens/Home';
-import PageFirst from '../screens/PageFirst';
-import PageSecond from '../screens/PageSecond';
+import Visits from '../screens/Visits';
+import Reports from '../screens/Reports';
+import RetailerDetails from '../screens/RetailerDetails';
+import RetailerOrder from '../screens/RetailerOrder';
 import Attendance from '../screens/Attendance';
 import OtpLogin from '../OtpBasedLogin/OtpLogin';
 import OtpScreen from '../OtpBasedLogin/OtpScreen';
@@ -25,17 +27,19 @@ const HomeStack = createStackNavigator({
 });
 
 const PageFirstStack = createStackNavigator({
-   PageFirst:PageFirst,
+   Visits:Visits,
+   RetailerDetails:RetailerDetails,
+   RetailerOrder:RetailerOrder,
 },
 {
-  initialRouteName: 'PageFirst',
+  initialRouteName: 'Visits',
 });
 
 const PageSecondStack = createStackNavigator({
-   PageSecond:PageSecond,
+   Reports:Reports,
 },
 {
-  initialRouteName: 'PageSecond',
+  initialRouteName: 'Reports',
 });
 
 const OtpLoginStack = createStackNavigator({

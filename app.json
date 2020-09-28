@@ -21,6 +21,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "android": {
+      "versionCode": 1,
+      "package": "in.cioc.mabler"
     }
   }
 }

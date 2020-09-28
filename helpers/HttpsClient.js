@@ -17,6 +17,7 @@ const HttpsClient = {
          data:null,
          error:null
        }
+
        var headers = {
           "Cookie" :"csrf="+token.csrf+"; sessionid=" + token.sessionid +";",
           'Accept': 'application/json',
