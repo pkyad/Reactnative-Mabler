@@ -37,7 +37,7 @@ export default class Headers extends React.Component {
 
   render(){
     //If you intent to create customize header create screen itself
-    var notify = [ 'RetailerDetails' , 'RetailerOrder']
+    var notify = [ 'RetailerDetails' , 'RetailerOrder','OrderDetail']
     return (
       <View style={{height:55,width:width,backgroundColor:themeColor,marginTop:Constants.statusBarHeight}}>
           <View style={{flexDirection: 'row',height:55,alignItems: 'center',}}>

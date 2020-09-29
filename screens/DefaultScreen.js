@@ -34,7 +34,7 @@ class DefaultScreen extends React.Component{
          if(data.type=='success'&&data.data.length>0){
              this.props.setUserDetails(data.data[0])
              AsyncStorage.setItem('mobile',JSON.stringify(data.data[0].profile.mobile));
-             this.props.navigation.navigate('Main')
+             this.props.navigation.navigate('Attendance')
              return
          }else{
              this.props.navigation.navigate('Login')

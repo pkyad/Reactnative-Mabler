@@ -175,7 +175,7 @@ verify() {
      AsyncStorage.setItem("csrf", responseJson.csrf_token)
      AsyncStorage.setItem("userpk", JSON.stringify(responseJson.pk))
      AsyncStorage.setItem("login", JSON.stringify(true)).then(res => {
-          return  this.props.navigation.navigate ('Attendance')
+          return  this.props.navigation.navigate ('DefaultScreen')
      });
     return
    })
