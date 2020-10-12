@@ -22,6 +22,7 @@ import Loader from '../helpers/Loader';
 import moment from 'moment';
 import { withNavigationFocus } from 'react-navigation';
 import { FloatingAction } from "react-native-floating-action";
+import Modal from "react-native-modal";
 
 
 const { width } = Dimensions.get('window');
@@ -77,7 +78,8 @@ class RetailerOrder extends React.Component {
        lastOrder:null,
        cartSelected:{pk:undefined},
        cartQty:0,
-       showZindex:true
+       showZindex:true,
+       warning:false
       }
       willFocus = props.navigation.addListener(
      'willFocus',
@@ -104,6 +106,7 @@ getCart=async()=>{
   var data = await HttpsClient.get(url + '/api/ERP/cartService/?retailer='+this.state.retailerPk)
   if(data.type=='success'){
       if(data.data.success){
+        console.log(data.data.records,'kkk');
         this.setState({cart:data.data.records,totalAmount:data.data.total==null?0:data.data.total})
       }
   }else{
@@ -154,11 +157,16 @@ getFocusItems=async()=>{
           <View style={{flex:0.2,alignItems: 'center',justifyContent: 'center'}}>
             <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}>Rate</Text>
           </View>
-          <View style={{flex:0.2,alignItems: 'center',justifyContent: 'center'}}>
-            <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}>Stock</Text>
-          </View>
-          <View style={{flex:0.2,alignItems: 'center',justifyContent: 'center'}}>
-            <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}>Qty</Text>
+          <View style={{flex:0.4,alignItems: 'center',justifyContent: 'center'}}>
+              <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}>Qty</Text>
+              <View style={{flex:1,flexDirection:'row'}}>
+                <View style={{flex:0.5,alignItems: 'center',justifyContent: 'center'}}>
+                  <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}>Stock</Text>
+                </View>
+                <View style={{flex:0.5,alignItems: 'center',justifyContent: 'center'}}>
+                  <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}>Order</Text>
+                </View>
+              </View>
           </View>
       </View>
     )
@@ -176,12 +184,29 @@ getFocusItems=async()=>{
    this.setState({showOptions:false})
    var data = await HttpsClient.post(url + '/api/ERP/cartService/',sendData)
    if(data.type=='success'){
+
        if(data.data.success){
          this.getCart()
        }
    }else{
        return
    }
+ }
+
+ showHideWarning=(bool)=>{
+   this.setState({warning:bool})
+ }
+
+ renderModal=()=>{
+   return(
+       <Modal isVisible={this.state.warning} propagateSwipe={true}  animationIn="fadeIn" useNativeDriver={true} animationOut="fadeOut" hasBackdrop={true} useNativeDriver={true} propagateSwipe={true} onRequestClose={()=>{this.setState({warning:false})}} onBackdropPress={()=>{this.setState({warning:false,})}} >
+         <View style={[styles.modalView,{height:width*0.2,borderRadius:10,overflow: 'hidden',}]}>
+            <View style={{backgroundColor:'#fff',flex:1,alignItems:'center',justifyContent:'center',padding:15}}>
+                 <Text style={{color:'#f00',fontSize:18,}}>Order quantity is more than Stock quantity</Text>
+            </View>
+         </View>
+       </Modal>
+     )
  }
 
  cartQuantity=async()=>{
@@ -195,6 +220,10 @@ getFocusItems=async()=>{
    console.log(data,'tcf');
    if(data.type=='success'){
        if(data.data.success){
+         console.log(data.data,'gdsfkhkj');
+         if(data.data.records.stockQty<data.data.records.qty){
+           this.showHideWarning(true)
+         }
          this.setState({cartSelected:{qty:undefined,cartQty:0}})
          this.getCart()
        }
@@ -248,6 +277,24 @@ getFocusItems=async()=>{
    }
  }
 
+ renderSchemes=()=>{
+     var gotoSchemes = ()=>{
+       this.props.navigation.navigate('Schemes',{item:this.state.retailer})
+     }
+     return(
+       <TouchableOpacity onPress={()=>{gotoSchemes()}} style={{flexDirection:'row',margin:15,backgroundColor:'#fff',padding:5,paddingVertical:15,marginTop:5,borderRadius:10}}>
+           <View style={{flex:0.7,borderBottomWidth:0,borderColor:'grey',alignItems:'center',justifyContent:'center',}}>
+               <Text style={{fontSize:10,color:'#000',marginBottom:2,}}>TAP ON SCHEMES TO VIEW ALL BEST OFFERS</Text>
+           </View>
+           <View style={{flex:0.3,alignItems:'center',justifyContent:'center',}}>
+               <TouchableOpacity onPress={()=>{gotoSchemes()}} style={{backgroundColor:themeColor,paddingHorizontal:10,paddingVertical:4,borderRadius:5}}>
+                  <Text style={{textAlign:'center',fontSize:14,color:'#fff'}}>SCHEMES</Text>
+               </TouchableOpacity>
+           </View>
+       </TouchableOpacity>
+     )
+ }
+
  changeQty=(item)=>{
    this.setState({cartSelected:item,cartQty:item.qty})
 
@@ -264,9 +311,11 @@ getFocusItems=async()=>{
               }
               {!this.state.loader&&
                 <View style={[{flex:1,paddingTop:0,}]}>
+                {this.renderModal()}
                   <ScrollView contentContainerStyle={{paddingBottom:230,}}>
 
                   {this.renderLastOrder()}
+                  {this.renderSchemes()}
 
                   {this.state.cart.length>0&&
                     <FlatList style={{borderColor : '#fff' , borderWidth:0,margin:0,backgroundColor:'#fff',zIndex:9}}
@@ -285,7 +334,7 @@ getFocusItems=async()=>{
                             <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{item.total}</Text>
                           </View>
                           <View style={{flex:0.2,alignItems: 'center',justifyContent: 'center'}}>
-                            <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{item.stock}</Text>
+                            <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{item.stockQty}</Text>
                           </View>
                           <View style={{flex:0.2,alignItems: 'center',justifyContent: 'center'}}>
                             {this.state.cartSelected.pk==item.pk&&
@@ -433,7 +482,11 @@ const styles = StyleSheet.create({
   },
   showZindex:{
     zIndex:99
-  }
+  },
+  modalView: {
+     backgroundColor: '#fff',
+     marginHorizontal: width*0.05 ,
+    },
 });
 
 const mapStateToProps =(state) => {

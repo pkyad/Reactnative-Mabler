@@ -14,6 +14,7 @@ import Visits from '../screens/Visits';
 import Reports from '../screens/Reports';
 import RetailerDetails from '../screens/RetailerDetails';
 import RetailerOrder from '../screens/RetailerOrder';
+import Schemes from '../screens/Schemes';
 import OrderDetail from '../screens/OrderDetail';
 import Attendance from '../screens/Attendance';
 import OtpLogin from '../OtpBasedLogin/OtpLogin';
@@ -32,6 +33,7 @@ const PageFirstStack = createStackNavigator({
    RetailerDetails:RetailerDetails,
    RetailerOrder:RetailerOrder,
    OrderDetail:OrderDetail,
+   Schemes:Schemes,
 },
 {
   initialRouteName: 'Visits',

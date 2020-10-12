@@ -12,6 +12,7 @@ const HttpsClient = {
 
     get: async function(url){
        var token = await getCredentials()
+
        var returnData = {
          type:'fail',
          data:null,
