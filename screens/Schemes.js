@@ -39,19 +39,25 @@ class Schemes extends React.Component {
   constructor(props) {
     super(props);
     var retailer = this.props.navigation.getParam('item',null)
+    var product = this.props.navigation.getParam('product',null)
     this.state={
        loader:false,
        user:props.user,
        schemes:[],
        visit:null,
        retailerPk:retailer.pk,
-       retailer:retailer
+       retailer:retailer,
+       product:product,
       }
     }
 
 getSchemes=async()=>{
-  // this.state.retailerPk
-  var data = await HttpsClient.get(url + '/api/ERP/scheme/?company='+'117')
+
+  var serverUrl = url + '/api/ERP/scheme/?company='+this.state.retailer.company
+  if(this.state.product!=null){
+    serverUrl =  url + '/api/ERP/scheme/?company='+this.state.retailer.company+'&product='+this.state.product.product.pk
+  }
+  var data = await HttpsClient.get(serverUrl)
   if(data.type=='success'){
     console.log(data.data);
     this.setState({schemes:data.data})

@@ -1,4 +1,4 @@
-const url = 'http://192.168.1.115:8000'
+const url = 'http://192.168.1.111:8000'
 // const url = 'https://mabler.cioc.in'
 // const themeColor = '#12318B'
 const themeColor = '#3260a8'

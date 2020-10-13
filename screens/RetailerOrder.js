@@ -8,7 +8,7 @@ import {
   Dimensions, Alert,StatusBar,
   FlatList, AppState, BackHandler ,
   AsyncStorage,ActivityIndicator,
-  ToastAndroid,RefreshControl,TouchableWithoutFeedback,TouchableNativeFeedback} from 'react-native';
+  ToastAndroid,RefreshControl,TouchableWithoutFeedback,TouchableNativeFeedback,Keyboard} from 'react-native';
 import {Fontisto, FontAwesome,Entypo,SimpleLineIcons,MaterialCommunityIcons,Feather,Octicons,MaterialIcons,FontAwesome5,AntDesign,EvilIcons } from '@expo/vector-icons';
 import  Constants  from 'expo-constants';
 import { connect } from 'react-redux';
@@ -78,8 +78,11 @@ class RetailerOrder extends React.Component {
        lastOrder:null,
        cartSelected:{pk:undefined},
        cartQty:0,
+       stockQty:0,
        showZindex:true,
-       warning:false
+       warning:false,
+       stockSelected:false,
+       qtySelected:false
       }
       willFocus = props.navigation.addListener(
      'willFocus',
@@ -151,8 +154,11 @@ getFocusItems=async()=>{
  itemHeader=()=>{
     return (
       <View style={{paddingVertical: 8,flex:1,backgroundColor:'#fff',flexDirection: 'row'}}>
-          <View style={{flex:0.4,alignItems: 'center',justifyContent: 'center'}}>
-            <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}>Product Name</Text>
+          <View style={{flex:0.4,flexDirection:'row'}}>
+            <View style={{flex:0.3,alignItems: 'center',justifyContent: 'center'}} />
+            <View style={{flex:0.7,alignItems: 'center',justifyContent: 'center',}}>
+              <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}>Product Name</Text>
+            </View>
           </View>
           <View style={{flex:0.2,alignItems: 'center',justifyContent: 'center'}}>
             <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}>Rate</Text>
@@ -184,7 +190,6 @@ getFocusItems=async()=>{
    this.setState({showOptions:false})
    var data = await HttpsClient.post(url + '/api/ERP/cartService/',sendData)
    if(data.type=='success'){
-
        if(data.data.success){
          this.getCart()
        }
@@ -214,17 +219,16 @@ getFocusItems=async()=>{
      retailer:this.state.retailerPk,
      product:this.state.cartSelected.product.pk,
      qty:this.state.cartQty,
+     stockQty:this.state.stockQty,
      reverse:this.state.cartSelected.reverse
    }
+   console.log(sendData,'sjzfnjd');
+   // return
    var data = await HttpsClient.post(url + '/api/ERP/cartService/',sendData)
    console.log(data,'tcf');
    if(data.type=='success'){
        if(data.data.success){
-         console.log(data.data,'gdsfkhkj');
-         if(data.data.records.stockQty<data.data.records.qty){
-           this.showHideWarning(true)
-         }
-         this.setState({cartSelected:{qty:undefined,cartQty:0}})
+         this.setState({cartSelected:{qty:undefined,cartQty:0,stockQty:0,stockSelected:false,qtySelected:false}})
          this.getCart()
        }
    }else{
@@ -279,7 +283,7 @@ getFocusItems=async()=>{
 
  renderSchemes=()=>{
      var gotoSchemes = ()=>{
-       this.props.navigation.navigate('Schemes',{item:this.state.retailer})
+       this.props.navigation.navigate('Schemes',{item:this.state.retailer,product:null})
      }
      return(
        <TouchableOpacity onPress={()=>{gotoSchemes()}} style={{flexDirection:'row',margin:15,backgroundColor:'#fff',padding:5,paddingVertical:15,marginTop:5,borderRadius:10}}>
@@ -296,14 +300,29 @@ getFocusItems=async()=>{
  }
 
  changeQty=(item)=>{
-   this.setState({cartSelected:item,cartQty:item.qty})
+   this.setState({cartSelected:item,qtySelected:true,stockSelected:false,cartQty:item.qty,stockQty:item.stockQty})
+   setTimeout(() => {this.inputQty.focus()}, 500)
 
+ }
+
+ changeStock=(item)=>{
+   this.setState({cartSelected:item,qtySelected:false,stockSelected:true,cartQty:item.qty,stockQty:item.stockQty})
+   setTimeout(() => {this.inputStock.focus()}, 500)
+ }
+
+ gotoScheme=(item)=>{
+   console.log(item,'jjkkkkkk');
+   if(item.scheme){
+     this.props.navigation.navigate('Schemes',{item:this.state.retailer,product:item})
+   }else{
+     ToastAndroid.showWithGravityAndOffset('No Scheme Available',ToastAndroid.SHORT,ToastAndroid.BOTTOM,25,500);
+   }
  }
 
   render() {
     return (
       <View style={[{flex:1,backgroundColor:'#e2e2e2',}]}>
-          <TouchableWithoutFeedback onPress={()=>{this.setState({showOptions:false})}}>
+          <TouchableWithoutFeedback onPress={()=>{this.setState({showOptions:false});Keyboard.dismiss()}} style={{flex: 1}}>
             <View style={{flex:1,}}>
               <Headers navigation={this.props.navigation} name={this.state.retailer.name} screen={'RetailerOrder'}/>
               {this.state.loader&&
@@ -311,8 +330,8 @@ getFocusItems=async()=>{
               }
               {!this.state.loader&&
                 <View style={[{flex:1,paddingTop:0,}]}>
-                {this.renderModal()}
-                  <ScrollView contentContainerStyle={{paddingBottom:230,}}>
+
+                  <ScrollView contentContainerStyle={{paddingBottom:230,}} keyboardShouldPersistTaps="always">
 
                   {this.renderLastOrder()}
                   {this.renderSchemes()}
@@ -326,34 +345,85 @@ getFocusItems=async()=>{
                       ListHeaderComponent={this.itemHeader}
                       nestedScrollEnabled={true}
                       renderItem={({item, index}) => (
-                        <View style={{paddingVertical: 10,flex:1,backgroundColor:item.reverse?'#ffe6e6':'#e6ffe6',flexDirection: 'row',}}>
-                          <View style={{flex:0.4,alignItems: 'center',justifyContent: 'center'}}>
-                            <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000',marginLeft:3}} >{item.product.name}{item.reverse}</Text>
+                       <TouchableWithoutFeedback onPress={()=>{this.gotoScheme(item)}}>
+                        <View style={{paddingVertical: 10,flex:1,backgroundColor:item.reverse?'#ffe6e6':'#e6ffe6',flexDirection: 'row',borderWidth:0.5,borderColor:'#e2e2e2'}}>
+                          <View style={{flex:0.4,flexDirection:'row'}}>
+                              <View style={{flex:0.3,alignItems:'center',justifyContent:'center'}}>
+                              {item.scheme&&
+                                <Entypo name="star" size={18} color={themeColor} />
+                              }
+                              </View>
+
+                            <View style={{flex:0.7,alignItems:'center',justifyContent:'center'}}>
+                              <Text  style={{ fontSize: 14,fontWeight: '400',color:'#000',}} >{item.product.name}</Text>
+                            </View>
                           </View>
                           <View style={{flex:0.2,alignItems: 'center',justifyContent: 'center'}}>
                             <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{item.total}</Text>
                           </View>
-                          <View style={{flex:0.2,alignItems: 'center',justifyContent: 'center'}}>
-                            <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{item.stockQty}</Text>
-                          </View>
-                          <View style={{flex:0.2,alignItems: 'center',justifyContent: 'center'}}>
+                          <View style={{flex:0.2,}}>
                             {this.state.cartSelected.pk==item.pk&&
-                              <TextInput style={{width:'70%',borderRadius:0,color:'#000',fontSize:16,height:30,backgroundColor:'#fff',textAlign:'center'}}
-                                  onChangeText={query => {this.setState({cartQty:query}) }}
-                                  autoFocus={true}
-                                  onBlur={()=>{this.cartQuantity()}}
-                                  value={this.state.cartQty.toString()}
-                                  keyboardType={'numeric'}
-                               />
+                              <View style={{flex:1,alignItems: 'center',justifyContent: 'center'}}>
+                              {this.state.stockSelected&&
+                                <TextInput style={{borderColor:'#f00',borderWidth:item.stockQty<item.qty?1:0,width:'70%',borderRadius:0,color:'#000',fontSize:16,height:30,backgroundColor:'#fff',textAlign:'center'}}
+                                    onChangeText={query => {this.setState({stockQty:query}) }}
+                                    ref={input => { this.inputStock = input}}
+                                    onBlur={()=>{this.inputStock.blur();this.cartQuantity()}}
+                                    value={this.state.stockQty.toString()}
+                                    keyboardType={'numeric'}
+                                    onSubmitEditing={()=>{this.inputStock.blur()}}
+                                 />
+                              }
+                              {!this.state.stockSelected&&
+                                <TouchableOpacity onPress={()=>{this.changeStock(item)}} style={{width:'70%',borderRadius:0,height:30,backgroundColor:'#fff',alignItems: 'center',justifyContent: 'center',borderColor:'#f00',borderWidth:item.stockQty<item.qty?1:0}}>
+                                   <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{this.state.stockQty}</Text>
+                                </TouchableOpacity>
+                              }
+                              </View>
+
                             }
+
                             {this.state.cartSelected.pk!=item.pk&&
-                               <TouchableOpacity onPress={()=>{this.changeQty(item)}} style={{width:'70%',borderRadius:0,height:30,backgroundColor:'#fff',alignItems: 'center',justifyContent: 'center'}}>
+                              <View style={{flex:1,alignItems: 'center',justifyContent: 'center'}}>
+                               <TouchableOpacity onPress={()=>{this.changeStock(item)}} style={{borderColor:'#f00',borderWidth:item.stockQty<item.qty?1:0,width:'70%',borderRadius:0,height:30,backgroundColor:'#fff',alignItems: 'center',justifyContent: 'center'}}>
+                                  <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{item.stockQty}</Text>
+                               </TouchableOpacity>
+                              </View>
+                            }
+                          </View>
+                          <View style={{flex:0.2,}}>
+                            {this.state.cartSelected.pk==item.pk&&
+                              <View style={{flex:1,alignItems: 'center',justifyContent: 'center'}}>
+                              {this.state.qtySelected&&
+                                <TextInput style={{borderColor:'#f00',borderWidth:item.stockQty<item.qty?1:0,width:'70%',borderRadius:0,color:'#000',fontSize:16,height:30,backgroundColor:'#fff',textAlign:'center'}}
+                                    onChangeText={query => {this.setState({cartQty:query}) }}
+                                    ref={input => { this.inputQty = input}}
+                                    onBlur={()=>{this.inputQty.blur();this.cartQuantity()}}
+                                    value={this.state.cartQty.toString()}
+                                    keyboardType={'numeric'}
+                                    onSubmitEditing={()=>{this.inputQty.blur()}}
+                                 />
+                              }
+                              {!this.state.qtySelected&&
+                                <TouchableOpacity onPress={()=>{this.changeQty(item)}} style={{borderColor:'#f00',borderWidth:item.stockQty<item.qty?1:0,width:'70%',borderRadius:0,height:30,backgroundColor:'#fff',alignItems: 'center',justifyContent: 'center'}}>
+                                   <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{this.state.cartQty}</Text>
+                                </TouchableOpacity>
+                              }
+                              </View>
+
+                            }
+
+                            {this.state.cartSelected.pk!=item.pk&&
+                              <View style={{flex:1,alignItems: 'center',justifyContent: 'center'}}>
+                               <TouchableOpacity onPress={()=>{this.changeQty(item)}} style={{borderColor:'#f00',borderWidth:item.stockQty<item.qty?1:0,width:'70%',borderRadius:0,height:30,backgroundColor:'#fff',alignItems: 'center',justifyContent: 'center'}}>
                                   <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{item.qty}</Text>
                                </TouchableOpacity>
+                              </View>
                             }
 
                           </View>
                         </View>
+                      </TouchableWithoutFeedback>
                       )}
                     />
                   }

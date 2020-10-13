@@ -8,6 +8,10 @@ import settings from '../appSettings';
 import * as Expo from 'expo';
 import * as Permissions from 'expo-permissions';
 import moment from 'moment';
+import { connect } from 'react-redux';
+import * as actions from '../actions/index';
+import * as actionTypes from '../actions/actionTypes';
+import HttpsClient from '../helpers/HttpsClient';
 
 
 const { width,height } = Dimensions.get('window');
@@ -25,13 +29,41 @@ class Attendance extends Component {
   constructor(props) {
     super(props);
       this.state = {
-
+        user:props.user,
+        loader:false
       }
 }
 
 
 componentDidMount(){
+    this.getAttendanceDetails()
+}
 
+getAttendanceDetails=async()=>{
+    this.setState({loader:true})
+    var data = await HttpsClient.get(SERVER_URL + '/api/ERP/attendance/?today=true&user='+this.state.user.pk)
+    if(data.type=='success'){
+        console.log(data,'datadata');
+        if(data.data.length>0){
+          this.props.navigation.navigate('Main')
+          return
+        }
+    }else{
+      this.setState({loader:false})
+    }
+}
+
+postAttendance = async()=>{
+  var sendData = {
+    user:this.state.user.pk,
+    date:moment(new Date()).format('YYYY-MM-DD')
+  }
+  var data = await HttpsClient.post(SERVER_URL + '/api/ERP/attendance/',sendData)
+  if(data.type=='success'){
+      this.props.navigation.navigate('Main')
+  }else{
+    return
+  }
 }
 
 renderHeader=()=>{
@@ -56,9 +88,15 @@ showToast=(msg)=>{
      return (
         <View style={{flex:1,backgroundColor:'#e2e2e2'}}>
 
-          {this.renderHeader()}
+        {this.state.loader&&
+          <View style={{flex:1,backgroundColor:"#e2e2e2",justifyContent:'center',alignItems:'center'}}>
+            <ActivityIndicator size={'large'} color={themeColor} />
+         </View>
+      }
+         {!this.state.loader&&
 
            <View style={{flex:1,zIndex:2,}}>
+            {this.renderHeader()}
                <View style={{flex:1}}>
 
                <View  style={{flex:0.5,justifyContent:'flex-end',backgroundColor:'#e2e2e2',borderWidth:0,alignItems:'center'}}>
@@ -70,7 +108,7 @@ showToast=(msg)=>{
                     <Text style={{fontSize:18,color:'#000',fontWeight:'600',marginVertical:5}}>{moment(moment.utc(new Date()).toDate()).local().format('DD - MMMM - YYYY')}</Text>
                     <Text style={{fontSize:18,color:'#000',fontWeight:'600',marginVertical:5}}>{moment(moment.utc(new Date()).toDate()).local().format('dddd')}</Text>
                     <View style={{flexDirection:'row'}}>
-                      <TouchableOpacity onPress={()=>{this.props.navigation.navigate('Main')}} style={{marginRight:10,backgroundColor:themeColor,borderRadius:20,paddingVertical:8,paddingHorizontal:20,marginVertical:15}}>
+                      <TouchableOpacity onPress={()=>{this.postAttendance()}} style={{marginRight:10,backgroundColor:themeColor,borderRadius:20,paddingVertical:8,paddingHorizontal:20,marginVertical:15}}>
                         <Text style={{fontSize:16,color:'#fff',fontWeight:'600'}}>Yes</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={()=>{this.props.navigation.navigate('Main')}} style={{marginLeft:10,backgroundColor:themeColor,borderRadius:20,paddingVertical:8,paddingHorizontal:20,marginVertical:15}}>
@@ -82,6 +120,7 @@ showToast=(msg)=>{
 
               </View>
            </View>
+         }
         </View>
     );
   }else{
@@ -121,4 +160,16 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Attendance
+const mapStateToProps =(state) => {
+    return {
+      user:state.reducer.user,
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Attendance)

@@ -88,7 +88,7 @@ const HttpsClient = {
            'Referer': url,
         }
       }
-      console.log(url,headers,sendData,'detail');
+
       await fetch(url,{
         method:'POST',
         headers: headers,

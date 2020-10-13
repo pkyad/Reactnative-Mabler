@@ -26,6 +26,14 @@ const { height } = Dimensions.get('window');
 const themeColor = settings.themeColor
 const url = settings.url
 
+const { UIManager } = NativeModules;
+
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 class Home extends React.Component {
 
@@ -43,6 +51,7 @@ class Home extends React.Component {
        newOutlet:null,
        orderValue:null,
        visits:null,
+       showArray:[{show:false},{show:false},{show:false},{show:false}]
       }
     }
 
@@ -99,6 +108,25 @@ getDashboard=async()=>{
    )
  }
 
+ changeIndex=(idx)=>{
+   var arr = this.state.showArray
+   if(arr[idx].show){
+     arr[idx].show = false
+     LayoutAnimation.easeInEaseOut();
+     this.setState({showArray:arr})
+   }else{
+     arr.forEach((i,index)=>{
+       i.show = true
+       if(index!=idx){
+         console.log(i);
+         i.show = false
+       }
+     })
+     LayoutAnimation.easeInEaseOut();
+     this.setState({showArray:arr})
+   }
+ }
+
   render() {
     return (
       <View style={{flex:1,backgroundColor:'#e2e2e2'}}>
@@ -111,17 +139,18 @@ getDashboard=async()=>{
                   <ScrollView contentContainerStyle={{paddingBottom:75}}>
 
                     {this.state.visits!=null&&
-                      <View style={[{marginTop:30,paddingHorizontal:15,paddingVertical:20,backgroundColor:'#fff',marginHorizontal:25,borderRadius:10}]}>
-                          <View style={{flexDirection:'row',}}>
+                    <TouchableWithoutFeedback style={{}} onPress={()=>this.changeIndex(0)}>
+                      <View style={[{marginTop:30,backgroundColor:'#fff',marginHorizontal:25,borderRadius:10}]}>
+                          <View style={{flexDirection:'row',paddingVertical:20,paddingHorizontal:15,}}>
                              <View style={{flex:0.4,}}>
                                <Image source={require('../assets/building.png')} style={{resizeMode:'contain'}}/>
                                <Text   style={{ color:'#000',fontWeight:'600',fontSize:18,marginTop:5}} numberOfLines={1}>Visits</Text>
                              </View>
                              <View style={{flex:0.6}}>
                                  <View style={{flex:1,alignItems:'flex-end',justifyContent:'flex-start'}}>
-                                  <Text   style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>{`Y'Day`}
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>{`Y'Day`}
                                     <Text style={{ color:'#000',fontWeight:'700',fontSize:20,}}>  {this.state.visits.ydayD}/{this.state.visits.ydayN}</Text>
-                                  </Text>
+                                    </Text>
                                  </View>
                                  <View style={{flex:1,alignItems:'flex-end',justifyContent:'flex-end'}}>
                                   <Text   style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>{`Efficiency`}
@@ -130,12 +159,74 @@ getDashboard=async()=>{
                                  </View>
                              </View>
                           </View>
+                          {this.state.showArray[0].show&&
+                            <View style={{}}>
+                              <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
+                                 <View style={{flex:0.8,}}>
+                                   <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Total Outlets (no's)`}</Text>
+                                 </View>
+                                 <View style={{flex:0.2,alignItems:'flex-end'}}>
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>80</Text>
+                                 </View>
+                              </View>
+                              <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
+                                 <View style={{flex:0.8,}}>
+                                   <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Visit as per beat plan (no's)`}</Text>
+                                 </View>
+                                 <View style={{flex:0.2,alignItems:'flex-end'}}>
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>24</Text>
+                                 </View>
+                              </View>
+                              <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
+                                 <View style={{flex:0.8,}}>
+                                   <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Outlets visited in beat plan Y'Day (no's)`}</Text>
+                                 </View>
+                                 <View style={{flex:0.2,alignItems:'flex-end'}}>
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>32</Text>
+                                 </View>
+                              </View>
+                              <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
+                                 <View style={{flex:0.8,}}>
+                                   <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Total retailers visited (no's)`}</Text>
+                                 </View>
+                                 <View style={{flex:0.2,alignItems:'flex-end'}}>
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>34</Text>
+                                 </View>
+                              </View>
+                              <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
+                                 <View style={{flex:0.8,}}>
+                                   <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Visit efficiency Y'Day`}</Text>
+                                 </View>
+                                 <View style={{flex:0.2,alignItems:'flex-end'}}>
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>94%</Text>
+                                 </View>
+                              </View>
+                              <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
+                                 <View style={{flex:0.8,}}>
+                                   <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Visit efficiency MTD`}</Text>
+                                 </View>
+                                 <View style={{flex:0.2,alignItems:'flex-end'}}>
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>96%</Text>
+                                 </View>
+                              </View>
+                              <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10,borderBottomLeftRadius:10,borderBottomRightRadius:10}}>
+                                 <View style={{flex:0.8,}}>
+                                   <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Reatailers not yet visited (no's)`}</Text>
+                                 </View>
+                                 <View style={{flex:0.2,alignItems:'flex-end'}}>
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>7</Text>
+                                 </View>
+                              </View>
+                            </View>
+                          }
                       </View>
+                      </TouchableWithoutFeedback>
                     }
 
                     {this.state.billCustomer!=null&&
-                      <View style={[{marginTop:20,paddingHorizontal:15,paddingVertical:20,backgroundColor:'#fff',marginHorizontal:25,borderRadius:10}]}>
-                          <View style={{flexDirection:'row',}}>
+                    <TouchableWithoutFeedback style={{}} onPress={()=>this.changeIndex(1)}>
+                      <View style={[{marginTop:20,backgroundColor:'#fff',marginHorizontal:25,borderRadius:10}]}>
+                          <View style={{flexDirection:'row',paddingVertical:20,paddingHorizontal:15,}}>
                              <View style={{flex:0.5,}}>
                                <Image source={require('../assets/list.png')} style={{resizeMode:'contain'}}/>
                                <Text   style={{ color:'#000',fontWeight:'600',fontSize:18,marginTop:5}} numberOfLines={1}>Billed Customers</Text>
@@ -153,12 +244,73 @@ getDashboard=async()=>{
                                  </View>
                              </View>
                           </View>
+                          {this.state.showArray[1].show&&
+                          <View style={{}}>
+                            <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
+                               <View style={{flex:0.4,}} />
+                               <View style={{flex:0.3,alignItems:'center'}}>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>Yesterday</Text>
+                               </View>
+                               <View style={{flex:0.15,alignItems:'center'}}>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>MTD</Text>
+                               </View>
+                               <View style={{flex:0.15,alignItems:'center'}}>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>LMTD</Text>
+                               </View>
+                            </View>
+                            <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
+                                <View style={{flex:0.4,}} >
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>Outlets visited</Text>
+                                </View>
+                                <View style={{flex:0.3,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>32</Text>
+                                </View>
+                                <View style={{flex:0.15,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>165</Text>
+                                </View>
+                                <View style={{flex:0.15,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>190</Text>
+                                </View>
+                            </View>
+                            <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
+                                <View style={{flex:0.4,}} >
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>Bills Cut</Text>
+                                </View>
+                                <View style={{flex:0.3,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>14</Text>
+                                </View>
+                                <View style={{flex:0.15,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>83</Text>
+                                </View>
+                                <View style={{flex:0.15,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>98</Text>
+                                </View>
+                            </View>
+                            <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
+                                <View style={{flex:0.4,}} >
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>Bills Cut % </Text>
+                                </View>
+                                <View style={{flex:0.3,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>44%</Text>
+                                </View>
+                                <View style={{flex:0.15,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>50%</Text>
+                                </View>
+                                <View style={{flex:0.15,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>52%</Text>
+                                </View>
+                            </View>
+
+                          </View>
+                        }
                       </View>
+                    </TouchableWithoutFeedback>
                     }
 
                     {this.state.orderValue!=null&&
-                      <View style={[{marginTop:20,paddingHorizontal:15,paddingVertical:20,backgroundColor:'#fff',marginHorizontal:25,borderRadius:10}]}>
-                          <View style={{flexDirection:'row',}}>
+                     <TouchableWithoutFeedback style={{}} onPress={()=>this.changeIndex(2)}>
+                      <View style={[{marginTop:20,backgroundColor:'#fff',marginHorizontal:25,borderRadius:10}]}>
+                          <View style={{flexDirection:'row',paddingHorizontal:15,paddingVertical:20,}}>
                              <View style={{flex:0.4,}}>
                                <Image source={require('../assets/order.png')} style={{resizeMode:'contain'}}/>
                                <Text   style={{ color:'#000',fontWeight:'600',fontSize:18,marginTop:5}} numberOfLines={1}>Order Values</Text>
@@ -176,12 +328,102 @@ getDashboard=async()=>{
                                  </View>
                              </View>
                           </View>
+                          {this.state.showArray[2].show&&
+                          <View style={{}}>
+                            <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
+                               <View style={{flex:0.25,}} />
+                               <View style={{flex:0.25,alignItems:'center'}}>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>Order Value</Text>
+                               </View>
+                               <View style={{flex:0.25,alignItems:'center'}}>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>Yesterday</Text>
+                               </View>
+                               <View style={{flex:0.25,alignItems:'center'}}>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>&#8377; 23,000</Text>
+                               </View>
+                            </View>
+                            <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
+                                <View style={{flex:0.25,}} >
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}></Text>
+                                </View>
+                                <View style={{flex:0.25,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}></Text>
+                                </View>
+                                <View style={{flex:0.25,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>MTD</Text>
+                                </View>
+                                <View style={{flex:0.25,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>&#8377; 345000</Text>
+                                </View>
+                            </View>
+                            <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10,backgroundColor:'rgba(50, 96, 168,0.3)'}}>
+                                <View style={{flex:0.25,}} >
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}></Text>
+                                </View>
+                                <View style={{flex:0.25,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}></Text>
+                                </View>
+                                <View style={{flex:0.25,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>LMTD</Text>
+                                </View>
+                                <View style={{flex:0.25,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>&#8377; 356000</Text>
+                                </View>
+                            </View>
+                            <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
+                                <View style={{flex:0.25,}} >
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}></Text>
+                                </View>
+                                <View style={{flex:0.25,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>Growth %</Text>
+                                </View>
+                                <View style={{flex:0.25,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>MTD</Text>
+                                </View>
+                                <View style={{flex:0.25,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>-3%</Text>
+                                </View>
+                            </View>
+                            <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10,backgroundColor:'rgba(50, 96, 168,0.3)'}}>
+                                <View style={{flex:0.25,}} >
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>Target</Text>
+                                </View>
+                                <View style={{flex:0.25,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}></Text>
+                                </View>
+                                <View style={{flex:0.25,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>MTD</Text>
+                                </View>
+                                <View style={{flex:0.25,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>&#8377; 450000</Text>
+                                </View>
+                            </View>
+                            <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
+                                <View style={{flex:0.25,}} >
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}></Text>
+                                </View>
+                                <View style={{flex:0.25,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>Ach %</Text>
+                                </View>
+                                <View style={{flex:0.25,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>MTD</Text>
+                                </View>
+                                <View style={{flex:0.25,alignItems:'center'}}>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>77%</Text>
+                                </View>
+                            </View>
+
+
+                          </View>
+                        }
                       </View>
+                      </TouchableWithoutFeedback>
                     }
 
                     {this.state.newOutlet!=null&&
-                      <View style={[{marginTop:20,paddingHorizontal:15,paddingVertical:20,backgroundColor:'#fff',marginHorizontal:25,borderRadius:10}]}>
-                          <View style={{flexDirection:'row',}}>
+                     <TouchableWithoutFeedback style={{}} onPress={()=>this.changeIndex(3)}>
+                      <View style={[{marginTop:20,backgroundColor:'#fff',marginHorizontal:25,borderRadius:10}]}>
+                          <View style={{flexDirection:'row',paddingHorizontal:15,paddingVertical:20,}}>
                              <View style={{flex:0.4,}}>
                                <Image source={require('../assets/real.png')} style={{resizeMode:'contain'}}/>
                                <Text   style={{ color:'#000',fontWeight:'600',fontSize:18,marginTop:5}} numberOfLines={1}>New Outlets</Text>
@@ -199,7 +441,52 @@ getDashboard=async()=>{
                                  </View>
                              </View>
                           </View>
+                        {this.state.showArray[3].show&&
+                          <View style={{}}>
+                            <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
+                               <View style={{flex:0.8,}}>
+                                 <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Month Opening`}</Text>
+                               </View>
+                               <View style={{flex:0.2,alignItems:'flex-end'}}>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>69</Text>
+                               </View>
+                            </View>
+                            <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
+                               <View style={{flex:0.8,}}>
+                                 <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`MTD Base`}</Text>
+                               </View>
+                               <View style={{flex:0.2,alignItems:'flex-end'}}>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>72</Text>
+                               </View>
+                            </View>
+                            <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
+                               <View style={{flex:0.8,}}>
+                                 <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`New Outlets`}</Text>
+                               </View>
+                               <View style={{flex:0.2,alignItems:'flex-end'}}>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>3</Text>
+                               </View>
+                            </View>
+                            <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
+                               <View style={{flex:0.8,}}>
+                                 <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`New Outlets LM`}</Text>
+                               </View>
+                               <View style={{flex:0.2,alignItems:'flex-end'}}>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>4</Text>
+                               </View>
+                            </View>
+                            <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10,borderBottomLeftRadius:10,borderBottomRightRadius:10}}>
+                               <View style={{flex:0.8,}}>
+                                 <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Target TM`}</Text>
+                               </View>
+                               <View style={{flex:0.2,alignItems:'flex-end'}}>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>75</Text>
+                               </View>
+                            </View>
+                          </View>
+                        }
                       </View>
+                    </TouchableWithoutFeedback>
                     }
 
                   </ScrollView>
