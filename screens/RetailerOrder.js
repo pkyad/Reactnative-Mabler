@@ -154,13 +154,13 @@ getFocusItems=async()=>{
  itemHeader=()=>{
     return (
       <View style={{paddingVertical: 8,flex:1,backgroundColor:'#fff',flexDirection: 'row'}}>
-          <View style={{flex:0.4,flexDirection:'row'}}>
+          <View style={{flex:0.35,flexDirection:'row'}}>
             <View style={{flex:0.3,alignItems: 'center',justifyContent: 'center'}} />
             <View style={{flex:0.7,alignItems: 'center',justifyContent: 'center',}}>
               <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}>Product Name</Text>
             </View>
           </View>
-          <View style={{flex:0.2,alignItems: 'center',justifyContent: 'center'}}>
+          <View style={{flex:0.15,alignItems: 'center',justifyContent: 'center'}}>
             <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}>Rate</Text>
           </View>
           <View style={{flex:0.4,alignItems: 'center',justifyContent: 'center'}}>
@@ -173,6 +173,9 @@ getFocusItems=async()=>{
                   <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}>Order</Text>
                 </View>
               </View>
+          </View>
+          <View style={{flex:0.1,alignItems: 'center',justifyContent: 'center'}}>
+            <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}></Text>
           </View>
       </View>
     )
@@ -189,11 +192,13 @@ getFocusItems=async()=>{
    }
    this.setState({showOptions:false})
    var data = await HttpsClient.post(url + '/api/ERP/cartService/',sendData)
+   console.log(data,'kdsgkfm');
    if(data.type=='success'){
        if(data.data.success){
          this.getCart()
        }
    }else{
+       ToastAndroid.showWithGravityAndOffset('Product Already added to the cart',ToastAndroid.LONG,ToastAndroid.BOTTOM,25,300);
        return
    }
  }
@@ -319,6 +324,17 @@ getFocusItems=async()=>{
    }
  }
 
+ deleteCart=async(item)=>{
+   var data = await HttpsClient.delete(url + '/api/ERP/cart/'+item.pk+'/')
+
+   if(data.type=='success'){
+       this.setState({cartSelected:{qty:undefined,cartQty:0,stockQty:0,stockSelected:false,qtySelected:false}})
+       this.getCart()
+   }else{
+       return
+   }
+ }
+
   render() {
     return (
       <View style={[{flex:1,backgroundColor:'#e2e2e2',}]}>
@@ -347,7 +363,7 @@ getFocusItems=async()=>{
                       renderItem={({item, index}) => (
                        <TouchableWithoutFeedback onPress={()=>{this.gotoScheme(item)}}>
                         <View style={{paddingVertical: 10,flex:1,backgroundColor:item.reverse?'#ffe6e6':'#e6ffe6',flexDirection: 'row',borderWidth:0.5,borderColor:'#e2e2e2'}}>
-                          <View style={{flex:0.4,flexDirection:'row'}}>
+                          <View style={{flex:0.35,flexDirection:'row'}}>
                               <View style={{flex:0.3,alignItems:'center',justifyContent:'center'}}>
                               {item.scheme&&
                                 <Entypo name="star" size={18} color={themeColor} />
@@ -358,14 +374,14 @@ getFocusItems=async()=>{
                               <Text  style={{ fontSize: 14,fontWeight: '400',color:'#000',}} >{item.product.name}</Text>
                             </View>
                           </View>
-                          <View style={{flex:0.2,alignItems: 'center',justifyContent: 'center'}}>
-                            <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{item.total}</Text>
+                          <View style={{flex:0.15,alignItems: 'center',justifyContent: 'center'}}>
+                            <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{item.product.ptr}</Text>
                           </View>
                           <View style={{flex:0.2,}}>
                             {this.state.cartSelected.pk==item.pk&&
                               <View style={{flex:1,alignItems: 'center',justifyContent: 'center'}}>
                               {this.state.stockSelected&&
-                                <TextInput style={{borderColor:'#f00',borderWidth:item.stockQty<item.qty?1:0,width:'70%',borderRadius:0,color:'#000',fontSize:16,height:30,backgroundColor:'#fff',textAlign:'center'}}
+                                <TextInput style={{borderColor:'#f00',borderWidth:item.distStock<item.qty?1:0,width:'70%',borderRadius:0,color:'#000',fontSize:16,height:30,backgroundColor:'#fff',textAlign:'center'}}
                                     onChangeText={query => {this.setState({stockQty:query}) }}
                                     ref={input => { this.inputStock = input}}
                                     onBlur={()=>{this.inputStock.blur();this.cartQuantity()}}
@@ -375,7 +391,7 @@ getFocusItems=async()=>{
                                  />
                               }
                               {!this.state.stockSelected&&
-                                <TouchableOpacity onPress={()=>{this.changeStock(item)}} style={{width:'70%',borderRadius:0,height:30,backgroundColor:'#fff',alignItems: 'center',justifyContent: 'center',borderColor:'#f00',borderWidth:item.stockQty<item.qty?1:0}}>
+                                <TouchableOpacity onPress={()=>{this.changeStock(item)}} style={{width:'70%',borderRadius:0,height:30,backgroundColor:'#fff',alignItems: 'center',justifyContent: 'center',borderColor:'#f00',borderWidth:item.distStock<item.qty?1:0}}>
                                    <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{this.state.stockQty}</Text>
                                 </TouchableOpacity>
                               }
@@ -385,7 +401,7 @@ getFocusItems=async()=>{
 
                             {this.state.cartSelected.pk!=item.pk&&
                               <View style={{flex:1,alignItems: 'center',justifyContent: 'center'}}>
-                               <TouchableOpacity onPress={()=>{this.changeStock(item)}} style={{borderColor:'#f00',borderWidth:item.stockQty<item.qty?1:0,width:'70%',borderRadius:0,height:30,backgroundColor:'#fff',alignItems: 'center',justifyContent: 'center'}}>
+                               <TouchableOpacity onPress={()=>{this.changeStock(item)}} style={{borderColor:'#f00',borderWidth:item.distStock<item.qty?1:0,width:'70%',borderRadius:0,height:30,backgroundColor:'#fff',alignItems: 'center',justifyContent: 'center'}}>
                                   <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{item.stockQty}</Text>
                                </TouchableOpacity>
                               </View>
@@ -395,7 +411,7 @@ getFocusItems=async()=>{
                             {this.state.cartSelected.pk==item.pk&&
                               <View style={{flex:1,alignItems: 'center',justifyContent: 'center'}}>
                               {this.state.qtySelected&&
-                                <TextInput style={{borderColor:'#f00',borderWidth:item.stockQty<item.qty?1:0,width:'70%',borderRadius:0,color:'#000',fontSize:16,height:30,backgroundColor:'#fff',textAlign:'center'}}
+                                <TextInput style={{borderColor:'#f00',borderWidth:item.distStock<item.qty?1:0,width:'70%',borderRadius:0,color:'#000',fontSize:16,height:30,backgroundColor:'#fff',textAlign:'center'}}
                                     onChangeText={query => {this.setState({cartQty:query}) }}
                                     ref={input => { this.inputQty = input}}
                                     onBlur={()=>{this.inputQty.blur();this.cartQuantity()}}
@@ -405,7 +421,7 @@ getFocusItems=async()=>{
                                  />
                               }
                               {!this.state.qtySelected&&
-                                <TouchableOpacity onPress={()=>{this.changeQty(item)}} style={{borderColor:'#f00',borderWidth:item.stockQty<item.qty?1:0,width:'70%',borderRadius:0,height:30,backgroundColor:'#fff',alignItems: 'center',justifyContent: 'center'}}>
+                                <TouchableOpacity onPress={()=>{this.changeQty(item)}} style={{borderColor:'#f00',borderWidth:item.distStock<item.qty?1:0,width:'70%',borderRadius:0,height:30,backgroundColor:'#fff',alignItems: 'center',justifyContent: 'center'}}>
                                    <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{this.state.cartQty}</Text>
                                 </TouchableOpacity>
                               }
@@ -415,13 +431,16 @@ getFocusItems=async()=>{
 
                             {this.state.cartSelected.pk!=item.pk&&
                               <View style={{flex:1,alignItems: 'center',justifyContent: 'center'}}>
-                               <TouchableOpacity onPress={()=>{this.changeQty(item)}} style={{borderColor:'#f00',borderWidth:item.stockQty<item.qty?1:0,width:'70%',borderRadius:0,height:30,backgroundColor:'#fff',alignItems: 'center',justifyContent: 'center'}}>
+                               <TouchableOpacity onPress={()=>{this.changeQty(item)}} style={{borderColor:'#f00',borderWidth:item.distStock<item.qty?1:0,width:'70%',borderRadius:0,height:30,backgroundColor:'#fff',alignItems: 'center',justifyContent: 'center'}}>
                                   <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{item.qty}</Text>
                                </TouchableOpacity>
                               </View>
                             }
 
                           </View>
+                          <TouchableOpacity onPress={()=>{this.deleteCart(item)}} style={{flex:0.15,alignItems: 'center',justifyContent: 'center'}}>
+                              <MaterialCommunityIcons name="delete-outline" size={24} color="red" />
+                          </TouchableOpacity>
                         </View>
                       </TouchableWithoutFeedback>
                       )}

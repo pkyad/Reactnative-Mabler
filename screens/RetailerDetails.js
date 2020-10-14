@@ -141,8 +141,11 @@ getDetails=async()=>{
                       </View>
                     }
 
-                    <View style={{marginTop:50,flex:1,alignItems:'center',justifyContent:'center'}}>
-                       <TouchableOpacity style={{backgroundColor:themeColor,borderRadius:20,paddingVertical:8,paddingHorizontal:20,marginVertical:15}} onPress={()=>{this.props.navigation.navigate('RetailerOrder',{item:this.state.retailer})}}>
+                    <View style={{marginTop:50,flex:1,alignItems:'center',justifyContent:'center',flexDirection:'row'}}>
+                       <TouchableOpacity style={{backgroundColor:themeColor,borderRadius:20,paddingVertical:8,paddingHorizontal:20,marginVertical:15}} onPress={()=>{this.props.navigation.navigate('Merchandise',{item:this.state.retailer})}}>
+                          <Text style={{fontSize:16,color:'#fff',fontWeight:'700'}}>Merchandise</Text>
+                       </TouchableOpacity>
+                       <TouchableOpacity style={{backgroundColor:themeColor,borderRadius:20,paddingVertical:8,paddingHorizontal:20,marginVertical:15,marginLeft:15}} onPress={()=>{this.props.navigation.navigate('RetailerOrder',{item:this.state.retailer})}}>
                           <Text style={{fontSize:16,color:'#fff',fontWeight:'700'}}>Continue</Text>
                        </TouchableOpacity>
                     </View>

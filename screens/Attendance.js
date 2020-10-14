@@ -43,10 +43,12 @@ getAttendanceDetails=async()=>{
     this.setState({loader:true})
     var data = await HttpsClient.get(SERVER_URL + '/api/ERP/attendance/?today=true&user='+this.state.user.pk)
     if(data.type=='success'){
-        console.log(data,'datadata');
         if(data.data.length>0){
+          this.props.setAttendance(data.data[0])
           this.props.navigation.navigate('Main')
           return
+        }else{
+          this.setState({loader:false})
         }
     }else{
       this.setState({loader:false})
@@ -56,11 +58,14 @@ getAttendanceDetails=async()=>{
 postAttendance = async()=>{
   var sendData = {
     user:this.state.user.pk,
-    date:moment(new Date()).format('YYYY-MM-DD')
+    date:moment(new Date()).format('YYYY-MM-DD'),
+    company:this.state.user.profile.empCompany,
   }
+
   var data = await HttpsClient.post(SERVER_URL + '/api/ERP/attendance/',sendData)
   if(data.type=='success'){
-      this.props.navigation.navigate('Main')
+    this.props.setAttendance(data.data)
+    this.props.navigation.navigate('Main')
   }else{
     return
   }
@@ -168,7 +173,7 @@ const mapStateToProps =(state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-
+     setAttendance:  (args) => dispatch(actions.setAttendance(args)),
   };
 }
 

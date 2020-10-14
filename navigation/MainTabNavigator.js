@@ -12,7 +12,9 @@ const loginType = settings.loginType
 import Home from '../screens/Home';
 import Visits from '../screens/Visits';
 import Reports from '../screens/Reports';
+import Training from '../screens/Training';
 import RetailerDetails from '../screens/RetailerDetails';
+import Merchandise from '../screens/Merchandise';
 import RetailerOrder from '../screens/RetailerOrder';
 import Schemes from '../screens/Schemes';
 import OrderDetail from '../screens/OrderDetail';
@@ -31,6 +33,7 @@ const HomeStack = createStackNavigator({
 const PageFirstStack = createStackNavigator({
    Visits:Visits,
    RetailerDetails:RetailerDetails,
+   Merchandise:Merchandise,
    RetailerOrder:RetailerOrder,
    OrderDetail:OrderDetail,
    Schemes:Schemes,
@@ -44,6 +47,13 @@ const PageSecondStack = createStackNavigator({
 },
 {
   initialRouteName: 'Reports',
+});
+
+const PageThirdStack = createStackNavigator({
+   Training:Training,
+},
+{
+  initialRouteName: 'Training',
 });
 
 const OtpLoginStack = createStackNavigator({
@@ -69,6 +79,12 @@ const drawerNavigator = createDrawerNavigator({
   } ,
   PageSecond:{
     screen:PageSecondStack,
+    navigationOptions:{
+      drawerLabel: () => null
+    }
+  },
+  PageThird:{
+    screen:PageThirdStack,
     navigationOptions:{
       drawerLabel: () => null
     }

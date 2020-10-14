@@ -28,7 +28,7 @@ export default class Headers extends React.Component {
   }
 
   redirect=()=>{
-    if(this.props.screen=='Visits'){
+    if(this.props.screen=='Visits'||this.props.screen == 'Training'){
       this.props.navigation.navigate('Home')
     }else{
       this.props.navigation.goBack()
@@ -37,7 +37,7 @@ export default class Headers extends React.Component {
 
   render(){
     //If you intent to create customize header create screen itself
-    var notify = [ 'RetailerDetails' , 'RetailerOrder','OrderDetail']
+    var notify = [ 'RetailerDetails' , 'RetailerOrder','OrderDetail','Training']
     return (
       <View style={{height:55,width:width,backgroundColor:themeColor,marginTop:Constants.statusBarHeight}}>
           <View style={{flexDirection: 'row',height:55,alignItems: 'center',}}>

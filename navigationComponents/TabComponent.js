@@ -38,6 +38,7 @@ export default class TabComponent extends React.Component {
     var pageFirst = ['Visits']
     var pageSecond = ['Reports']
 
+
     return (
     <View style={{position: 'absolute',bottom:0,height:55,left:0,width:'100%',borderTopWidth:1,borderColor:'#f2f2f2',}}>
     <View style={{flex:1,flexDirection:'row',backgroundColor:'#404040',alignItems: 'center',justifyContent:'space-between'}}>

@@ -4,6 +4,7 @@ import {AsyncStorage } from 'react-native';
 
 const initialState = {
    user:null,
+   attendance:null
 }
 
 
@@ -14,6 +15,11 @@ const reducer = (state = initialState, action) => {
               return {
                ...state,
                user: action.payload,
+              }
+            case actionTypes.SET_ATTENDANCE:
+              return {
+               ...state,
+               attendance: action.payload,
               }
             default:
               return state
