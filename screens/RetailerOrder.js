@@ -82,7 +82,9 @@ class RetailerOrder extends React.Component {
        showZindex:true,
        warning:false,
        stockSelected:false,
-       qtySelected:false
+       qtySelected:false,
+       opacity: new Animated.Value(0),
+       stopAnimation:false
       }
       willFocus = props.navigation.addListener(
      'willFocus',
@@ -133,7 +135,35 @@ getFocusItems=async()=>{
     this.getLastOrder()
     this.getCart()
     this.getFocusItems()
+    this.animateFadeIn()
  }
+
+ animateFadeIn = () => {
+   if(!this.state.stopAnimation){
+     console.log('excute');
+     Animated.timing(this.state.opacity, {
+       toValue: 1,
+       duration: 3000,
+       useNativeDriver:true
+     }).start(this.animateFadeOut);
+   }
+ };
+
+ componentWillUnmount = () => {
+  this.setState({stopAnimation:true})
+};
+animateFadeOut = () => {
+  if(!this.state.stopAnimation){
+    console.log('excute');
+    Animated.timing(this.state.opacity, {
+      toValue: 0,
+      duration: 3000,
+      useNativeDriver:true
+    }).start(this.animateFadeIn);
+  }
+};
+
+
 
  search=async(text)=>{
   this.setState({showOptions:false,searchText:text,})
@@ -155,15 +185,15 @@ getFocusItems=async()=>{
     return (
       <View style={{paddingVertical: 8,flex:1,backgroundColor:'#fff',flexDirection: 'row'}}>
           <View style={{flex:0.35,flexDirection:'row'}}>
-            <View style={{flex:0.3,alignItems: 'center',justifyContent: 'center'}} />
-            <View style={{flex:0.7,alignItems: 'center',justifyContent: 'center',}}>
+            <View style={{flex:0.2,alignItems: 'center',justifyContent: 'center'}} />
+            <View style={{flex:0.8,alignItems: 'center',justifyContent: 'center',}}>
               <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}>Product Name</Text>
             </View>
           </View>
-          <View style={{flex:0.15,alignItems: 'center',justifyContent: 'center'}}>
+          <View style={{flex:0.17,alignItems: 'center',justifyContent: 'center'}}>
             <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}>Rate</Text>
           </View>
-          <View style={{flex:0.4,alignItems: 'center',justifyContent: 'center'}}>
+          <View style={{flex:0.38,alignItems: 'center',justifyContent: 'center'}}>
               <Text  style={{fontSize: 14,fontWeight: '600',color:'#000',textAlign:'center'}}>Qty</Text>
               <View style={{flex:1,flexDirection:'row'}}>
                 <View style={{flex:0.5,alignItems: 'center',justifyContent: 'center'}}>
@@ -198,7 +228,7 @@ getFocusItems=async()=>{
          this.getCart()
        }
    }else{
-       ToastAndroid.showWithGravityAndOffset('Product Already added to the cart',ToastAndroid.LONG,ToastAndroid.BOTTOM,25,300);
+       ToastAndroid.showWithGravityAndOffset('Product Already added to the cart',ToastAndroid.LONG,ToastAndroid.TOP,25,300);
        return
    }
  }
@@ -340,7 +370,7 @@ getFocusItems=async()=>{
       <View style={[{flex:1,backgroundColor:'#e2e2e2',}]}>
           <TouchableWithoutFeedback onPress={()=>{this.setState({showOptions:false});Keyboard.dismiss()}} style={{flex: 1}}>
             <View style={{flex:1,}}>
-              <Headers navigation={this.props.navigation} name={this.state.retailer.name} screen={'RetailerOrder'}/>
+              <Headers navigation={this.props.navigation} name={this.state.retailer.name} screen={'RetailerOrder'} notificationBack={'PageFirst'}/>
               {this.state.loader&&
                 <Loader />
               }
@@ -364,20 +394,22 @@ getFocusItems=async()=>{
                        <TouchableWithoutFeedback onPress={()=>{this.gotoScheme(item)}}>
                         <View style={{paddingVertical: 10,flex:1,backgroundColor:item.reverse?'#ffe6e6':'#e6ffe6',flexDirection: 'row',borderWidth:0.5,borderColor:'#e2e2e2'}}>
                           <View style={{flex:0.35,flexDirection:'row'}}>
-                              <View style={{flex:0.3,alignItems:'center',justifyContent:'center'}}>
+                              <View style={{flex:0.2,alignItems:'flex-end',justifyContent:'center'}}>
                               {item.scheme&&
-                                <Entypo name="star" size={18} color={themeColor} />
+                                <Animated.View style={{ opacity:this.state.opacity,backgroundColor:themeColor,width:20,height:20,borderRadius:10,alignItems:'center',justifyContent:'center'}} >
+                                  <Text  style={{ fontSize: 14,fontWeight: '400',color:'#fff',}} >S</Text>
+                                </Animated.View>
                               }
                               </View>
 
-                            <View style={{flex:0.7,alignItems:'center',justifyContent:'center'}}>
+                            <View style={{flex:0.8,alignItems:'center',justifyContent:'center'}}>
                               <Text  style={{ fontSize: 14,fontWeight: '400',color:'#000',}} >{item.product.name}</Text>
                             </View>
                           </View>
-                          <View style={{flex:0.15,alignItems: 'center',justifyContent: 'center'}}>
-                            <Text  style={{ fontSize: 16,fontWeight: '400',color:'#000'}}>{item.product.ptr}</Text>
+                          <View style={{flex:0.17,alignItems: 'center',justifyContent: 'center'}}>
+                            <Text  style={{ fontSize: 14,fontWeight: '400',color:'#000'}}>{item.product.ptr}</Text>
                           </View>
-                          <View style={{flex:0.2,}}>
+                          <View style={{flex:0.19,}}>
                             {this.state.cartSelected.pk==item.pk&&
                               <View style={{flex:1,alignItems: 'center',justifyContent: 'center'}}>
                               {this.state.stockSelected&&
@@ -407,7 +439,7 @@ getFocusItems=async()=>{
                               </View>
                             }
                           </View>
-                          <View style={{flex:0.2,}}>
+                          <View style={{flex:0.19,}}>
                             {this.state.cartSelected.pk==item.pk&&
                               <View style={{flex:1,alignItems: 'center',justifyContent: 'center'}}>
                               {this.state.qtySelected&&

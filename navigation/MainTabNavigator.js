@@ -14,13 +14,16 @@ import Visits from '../screens/Visits';
 import Reports from '../screens/Reports';
 import Training from '../screens/Training';
 import RetailerDetails from '../screens/RetailerDetails';
+import Notification from '../screens/Notification';
 import Merchandise from '../screens/Merchandise';
 import RetailerOrder from '../screens/RetailerOrder';
 import Schemes from '../screens/Schemes';
 import OrderDetail from '../screens/OrderDetail';
 import Attendance from '../screens/Attendance';
+
 import OtpLogin from '../OtpBasedLogin/OtpLogin';
 import OtpScreen from '../OtpBasedLogin/OtpScreen';
+
 import DrawerContent from '../navigationComponents/DrawerContent';
 
 const HomeStack = createStackNavigator({
@@ -56,6 +59,13 @@ const PageThirdStack = createStackNavigator({
   initialRouteName: 'Training',
 });
 
+const NotificationStack = createStackNavigator({
+   Notification:Notification,
+},
+{
+  initialRouteName: 'Notification',
+});
+
 const OtpLoginStack = createStackNavigator({
    OtpLogin:OtpLogin,
    OtpScreen:OtpScreen,
@@ -89,12 +99,13 @@ const drawerNavigator = createDrawerNavigator({
       drawerLabel: () => null
     }
   },
-  // Login:{
-  //   screen:loginType=='otp'?OtpLoginStack:OtpLoginStack,
-  //   navigationOptions:{
-  //     drawerLabel: () => null
-  //   }
-  // },
+  NotificationStack:{
+    screen:NotificationStack,
+    navigationOptions:{
+      drawerLabel: () => null
+    }
+  },
+
 
   },
   {

@@ -109,7 +109,7 @@ class OrderDetail extends React.Component {
       <View style={{flex:1,backgroundColor:'#e2e2e2',zIndex:9}}>
           <TouchableWithoutFeedback onPress={()=>{this.setState({showOptions:false})}}>
             <View style={{flex:1,}}>
-              <Headers navigation={this.props.navigation} name={this.state.retailer.name} screen={'OrderDetail'}/>
+              <Headers navigation={this.props.navigation} name={this.state.retailer.name} screen={'OrderDetail'} notificationBack={'PageFirst'}/>
               {this.state.loader&&
                 <Loader />
               }

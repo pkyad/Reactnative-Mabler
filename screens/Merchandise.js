@@ -236,7 +236,7 @@ renderModal=()=>{
   render() {
     return (
       <View style={{flex:1,backgroundColor:'#e2e2e2'}}>
-              <Headers navigation={this.props.navigation} name={this.state.retailer.name} screen={'RetailerDetails'}/>
+              <Headers navigation={this.props.navigation} name={this.state.retailer.name} screen={'RetailerDetails'} notificationBack={'PageFirst'}/>
               {this.state.loader&&
                 <Loader />
               }

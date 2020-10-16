@@ -86,9 +86,9 @@ class DrawerContent  extends React.Component {
       var routeName = this.props.items.find(it => it.key === this.props.activeItemKey)
 
       return(
-        <ScrollView containerStyle={{flex:1}}>
-          <ScrollView  contentContainerStyle={{height:(height+Constants.statusBarHeight)-8}} >
-          <LinearGradient colors={['rgba(13,94,224,0.5)', 'rgba(6,56,138,1)']} style={{ position: 'absolute', left: 0, right: 0, top: Constants.statusBarHeight, bottom:0 }} >
+        <View style={{flex:1}}>
+          <View  style={{flex:1}} >
+          <LinearGradient colors={['rgba(13,94,224,0.5)', 'rgba(6,56,138,1)']} style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom:0 }} >
              <View style={{height:80,alignItems:'flex-end'}} >
                <TouchableOpacity onPress={()=>{this.props.navigation.closeDrawer()}} style={{paddingHorizontal: 15,paddingVertical:10}}>
                  <SimpleLineIcons name={'menu'} size={22} color={'#fff'}/>
@@ -147,8 +147,8 @@ class DrawerContent  extends React.Component {
 
         </LinearGradient>
 
-          </ScrollView>
-        </ScrollView>
+          </View>
+        </View>
     );
   }
 }

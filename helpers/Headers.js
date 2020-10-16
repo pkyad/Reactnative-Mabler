@@ -28,8 +28,15 @@ export default class Headers extends React.Component {
   }
 
   redirect=()=>{
-    if(this.props.screen=='Visits'||this.props.screen == 'Training'){
-      this.props.navigation.navigate('Home')
+    if(this.props.screen=='Visits'||this.props.screen == 'Training'||this.props.screen =='Notification'){
+      console.log(this.props.notificationBack,'this.props.notificationBack');
+      if(this.props.notificationBack=='Training'){
+        this.props.navigation.navigate('PageThird')
+      }else if(this.props.notificationBack=='PageFirst'){
+        this.props.navigation.navigate('PageFirst')
+      }else{
+        this.props.navigation.navigate('Home')
+      }
     }else{
       this.props.navigation.goBack()
     }
@@ -50,7 +57,7 @@ export default class Headers extends React.Component {
                <Text   style={{ color:'#fff',fontWeight:'700',fontSize:18,textAlign:'center',}} numberOfLines={1}>{this.props.name}</Text>
              </View>
              {notify.includes(this.props.screen)&&
-               <TouchableOpacity onPress={()=>{}} style={{ flex: 0.2, flexDirection: 'row', justifyContent: 'center', alignItems: 'center',}}>
+               <TouchableOpacity onPress={()=>{this.props.navigation.navigate('Notification')}} style={{ flex: 0.2, flexDirection: 'row', justifyContent: 'center', alignItems: 'center',}}>
                   <View style={{position:'absolute',top:0,bottom:10,right:10,left:0, justifyContent: 'center', alignItems: 'center',}}>
                      <View style={{backgroundColor:'red',width:8,height:8,borderRadius:4,zIndex:999}} />
                   </View>

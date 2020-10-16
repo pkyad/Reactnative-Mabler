@@ -52,13 +52,13 @@ class Notification extends React.Component {
       this.getNotification()
     }
 
-    getMerchandise=async()=>{
-      var data = await HttpsClient.get(url + '/api/ERP/merchandise/?company='+this.state.user.profile.empCompany)
-      if(data.type=='success'){
-            this.setState({data:data.data})
-      }else{
-          return
-      }
+    getNotification=async()=>{
+      // var data = await HttpsClient.get(url + '/api/ERP/merchandise/?company='+this.state.user.profile.empCompany)
+      // if(data.type=='success'){
+      //       this.setState({data:data.data})
+      // }else{
+      //     return
+      // }
     }
 
   renderHeader=()=>{
@@ -76,7 +76,7 @@ class Notification extends React.Component {
                </TouchableOpacity>
             </View>
             <View style={{ flex: 0.6, flexDirection: 'row', justifyContent: 'center',alignItems: 'center', }}>
-              <Text   style={{ color:'#fff',fontWeight:'700',fontSize:18,textAlign:'center',}} numberOfLines={1}>Training</Text>
+              <Text   style={{ color:'#fff',fontWeight:'700',fontSize:18,textAlign:'center',}} numberOfLines={1}>Notification</Text>
             </View>
          </View>
          <View style={{flexDirection: 'row',flex:0.7,}}>
@@ -95,7 +95,7 @@ class Notification extends React.Component {
   render() {
     return (
       <View style={{flex:1,backgroundColor:'#e2e2e2'}}>
-          <Headers navigation={this.props.navigation} name={'Training'} screen={'Training'}/>
+          <Headers navigation={this.props.navigation} name={'Notification'} screen={'Notification'}/>
           {this.state.loader&&
             <Loader />
           }
@@ -112,13 +112,7 @@ class Notification extends React.Component {
                   console.log(item,'hsanlfjnjlk');
                   return (
                     <View style={{marginHorizontal:15,marginVertical:8,flex:1,backgroundColor:'#fff',borderWidth:0.5,borderColor:'#fff',borderRadius:10}}>
-                        <View style={{width:'100%',height:150}}>
-                          <Image source={{uri:item.image1}} style={{ width: '100%', height:150, borderTopLeftRadius: 10,borderTopRightRadius: 10,backgroundColor:'transparent' }}  />
-                        </View>
-                        <View style={{paddingVertical: 10,paddingHorizontal:15}}>
-                            <Text style={{color:'#000',fontSize:18}}>{item.comment}
-                            </Text>
-                        </View>
+
                     </View>
                   )
                 }}

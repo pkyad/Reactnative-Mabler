@@ -51,7 +51,11 @@ class Home extends React.Component {
        newOutlet:null,
        orderValue:null,
        visits:null,
-       showArray:[{show:false},{show:false},{show:false},{show:false}]
+       showArray:[{show:false},{show:false},{show:false},{show:false}],
+       visitData:null,
+       billData:null,
+       orderData:null,
+       outletData:null,
       }
     }
 
@@ -66,7 +70,22 @@ getDashboard=async()=>{
   }
 }
 
+getDashboardOverview=async(type)=>{
+  var data = await HttpsClient.get(url + '/api/ERP/frontlinerDashboardOverview/?type='+type)
+  if(data.type=='success'){
+    console.log(data.data,'kkkkkkkk');
+    if (type=='visits') this.setState({visitData:data.data});
+    if (type=='billed') this.setState({billData:data.data});
+    if (type=='ordervalues') this.setState({orderData:data.data});
+    if (type=='newoutlet') this.setState({outletData:data.data});
+    LayoutAnimation.easeInEaseOut();
+  }else{
+      return
+  }
+}
+
  componentDidMount(){
+    console.log(this.state.user,'kkkkkk');
     this.getDashboard()
  }
 
@@ -108,7 +127,7 @@ getDashboard=async()=>{
    )
  }
 
- changeIndex=(idx)=>{
+ changeIndex=(idx,type)=>{
    var arr = this.state.showArray
    if(arr[idx].show){
      arr[idx].show = false
@@ -122,6 +141,7 @@ getDashboard=async()=>{
          i.show = false
        }
      })
+     this.getDashboardOverview(type)
      LayoutAnimation.easeInEaseOut();
      this.setState({showArray:arr})
    }
@@ -139,7 +159,7 @@ getDashboard=async()=>{
                   <ScrollView contentContainerStyle={{paddingBottom:75}}>
 
                     {this.state.visits!=null&&
-                    <TouchableWithoutFeedback style={{}} onPress={()=>this.changeIndex(0)}>
+                    <TouchableWithoutFeedback style={{}} onPress={()=>this.changeIndex(0,'visits')}>
                       <View style={[{marginTop:30,backgroundColor:'#fff',marginHorizontal:25,borderRadius:10}]}>
                           <View style={{flexDirection:'row',paddingVertical:20,paddingHorizontal:15,}}>
                              <View style={{flex:0.4,}}>
@@ -160,13 +180,20 @@ getDashboard=async()=>{
                              </View>
                           </View>
                           {this.state.showArray[0].show&&
+                            <View>
+                              {this.state.visitData==null&&
+                                <View style={{height:100,alignItems:'center',justifyContent:'center'}}>
+                                    <ActivityIndicator color={themeColor} size={'small'} />
+                                </View>
+                              }
+                            {this.state.visitData!=null&&
                             <View style={{}}>
                               <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
                                  <View style={{flex:0.8,}}>
                                    <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Total Outlets (no's)`}</Text>
                                  </View>
                                  <View style={{flex:0.2,alignItems:'flex-end'}}>
-                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>80</Text>
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>{this.state.visitData.retailerCount}</Text>
                                  </View>
                               </View>
                               <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
@@ -174,7 +201,7 @@ getDashboard=async()=>{
                                    <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Visit as per beat plan (no's)`}</Text>
                                  </View>
                                  <View style={{flex:0.2,alignItems:'flex-end'}}>
-                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>24</Text>
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>{this.state.visitData.visitCount}</Text>
                                  </View>
                               </View>
                               <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
@@ -182,7 +209,7 @@ getDashboard=async()=>{
                                    <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Outlets visited in beat plan Y'Day (no's)`}</Text>
                                  </View>
                                  <View style={{flex:0.2,alignItems:'flex-end'}}>
-                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>32</Text>
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>{this.state.visitData.visited}</Text>
                                  </View>
                               </View>
                               <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
@@ -190,7 +217,7 @@ getDashboard=async()=>{
                                    <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Total retailers visited (no's)`}</Text>
                                  </View>
                                  <View style={{flex:0.2,alignItems:'flex-end'}}>
-                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>34</Text>
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>{this.state.visitData.totalVisit}</Text>
                                  </View>
                               </View>
                               <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
@@ -198,7 +225,7 @@ getDashboard=async()=>{
                                    <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Visit efficiency Y'Day`}</Text>
                                  </View>
                                  <View style={{flex:0.2,alignItems:'flex-end'}}>
-                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>94%</Text>
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>{this.state.visitData.visitEff}%</Text>
                                  </View>
                               </View>
                               <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
@@ -206,7 +233,7 @@ getDashboard=async()=>{
                                    <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Visit efficiency MTD`}</Text>
                                  </View>
                                  <View style={{flex:0.2,alignItems:'flex-end'}}>
-                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>96%</Text>
+                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>{this.state.visitData.visitEffinMTD}%</Text>
                                  </View>
                               </View>
                               <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10,borderBottomLeftRadius:10,borderBottomRightRadius:10}}>
@@ -218,13 +245,17 @@ getDashboard=async()=>{
                                  </View>
                               </View>
                             </View>
+                            }
+
+                            </View>
+
                           }
-                      </View>
+                          </View>
                       </TouchableWithoutFeedback>
                     }
 
                     {this.state.billCustomer!=null&&
-                    <TouchableWithoutFeedback style={{}} onPress={()=>this.changeIndex(1)}>
+                    <TouchableWithoutFeedback style={{}} onPress={()=>this.changeIndex(1,'billed')}>
                       <View style={[{marginTop:20,backgroundColor:'#fff',marginHorizontal:25,borderRadius:10}]}>
                           <View style={{flexDirection:'row',paddingVertical:20,paddingHorizontal:15,}}>
                              <View style={{flex:0.5,}}>
@@ -245,6 +276,13 @@ getDashboard=async()=>{
                              </View>
                           </View>
                           {this.state.showArray[1].show&&
+                            <View>
+                              {this.state.billData==null&&
+                                <View style={{height:100,alignItems:'center',justifyContent:'center'}}>
+                                    <ActivityIndicator color={themeColor} size={'small'} />
+                                </View>
+                              }
+                            {this.state.billData!=null&&
                           <View style={{}}>
                             <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
                                <View style={{flex:0.4,}} />
@@ -263,13 +301,13 @@ getDashboard=async()=>{
                                     <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>Outlets visited</Text>
                                 </View>
                                 <View style={{flex:0.3,alignItems:'center'}}>
-                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>32</Text>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{this.state.billData.visited}</Text>
                                 </View>
                                 <View style={{flex:0.15,alignItems:'center'}}>
-                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>165</Text>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{this.state.billData.visitedMTD}</Text>
                                 </View>
                                 <View style={{flex:0.15,alignItems:'center'}}>
-                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>190</Text>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{this.state.billData.visitedLMTD}</Text>
                                 </View>
                             </View>
                             <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
@@ -277,13 +315,13 @@ getDashboard=async()=>{
                                     <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>Bills Cut</Text>
                                 </View>
                                 <View style={{flex:0.3,alignItems:'center'}}>
-                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>14</Text>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{this.state.billData.billcutYes}</Text>
                                 </View>
                                 <View style={{flex:0.15,alignItems:'center'}}>
-                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>83</Text>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{this.state.billData.billcutMTD}</Text>
                                 </View>
                                 <View style={{flex:0.15,alignItems:'center'}}>
-                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>98</Text>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{this.state.billData.billcutLMTD}</Text>
                                 </View>
                             </View>
                             <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
@@ -291,24 +329,26 @@ getDashboard=async()=>{
                                     <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>Bills Cut % </Text>
                                 </View>
                                 <View style={{flex:0.3,alignItems:'center'}}>
-                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>44%</Text>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{this.state.billData.billcutYesPer}%</Text>
                                 </View>
                                 <View style={{flex:0.15,alignItems:'center'}}>
-                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>50%</Text>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{this.state.billData.billcutMTDPer}%</Text>
                                 </View>
                                 <View style={{flex:0.15,alignItems:'center'}}>
-                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>52%</Text>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{this.state.billData.billcutLMTDPer}%</Text>
                                 </View>
                             </View>
 
                           </View>
+                        }
+                        </View>
                         }
                       </View>
                     </TouchableWithoutFeedback>
                     }
 
                     {this.state.orderValue!=null&&
-                     <TouchableWithoutFeedback style={{}} onPress={()=>this.changeIndex(2)}>
+                     <TouchableWithoutFeedback style={{}} onPress={()=>this.changeIndex(2,'ordervalues')}>
                       <View style={[{marginTop:20,backgroundColor:'#fff',marginHorizontal:25,borderRadius:10}]}>
                           <View style={{flexDirection:'row',paddingHorizontal:15,paddingVertical:20,}}>
                              <View style={{flex:0.4,}}>
@@ -329,6 +369,13 @@ getDashboard=async()=>{
                              </View>
                           </View>
                           {this.state.showArray[2].show&&
+                            <View>
+                            {this.state.orderData==null&&
+                              <View style={{height:100,alignItems:'center',justifyContent:'center'}}>
+                                  <ActivityIndicator color={themeColor} size={'small'} />
+                              </View>
+                            }
+                          {this.state.orderData!=null&&
                           <View style={{}}>
                             <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
                                <View style={{flex:0.25,}} />
@@ -339,7 +386,7 @@ getDashboard=async()=>{
                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>Yesterday</Text>
                                </View>
                                <View style={{flex:0.25,alignItems:'center'}}>
-                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>&#8377; 23,000</Text>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>&#8377; {this.state.orderData.billcutYesAmount}</Text>
                                </View>
                             </View>
                             <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
@@ -353,7 +400,7 @@ getDashboard=async()=>{
                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>MTD</Text>
                                 </View>
                                 <View style={{flex:0.25,alignItems:'center'}}>
-                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>&#8377; 345000</Text>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>&#8377; {this.state.orderData.billcutMTDAmount}</Text>
                                 </View>
                             </View>
                             <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10,backgroundColor:'rgba(50, 96, 168,0.3)'}}>
@@ -367,7 +414,7 @@ getDashboard=async()=>{
                                    <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>LMTD</Text>
                                 </View>
                                 <View style={{flex:0.25,alignItems:'center'}}>
-                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>&#8377; 356000</Text>
+                                   <Text style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>&#8377; {this.state.orderData.billcutLMTDAmount}</Text>
                                 </View>
                             </View>
                             <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
@@ -417,11 +464,13 @@ getDashboard=async()=>{
                           </View>
                         }
                       </View>
+                    }
+                    </View>
                       </TouchableWithoutFeedback>
                     }
 
                     {this.state.newOutlet!=null&&
-                     <TouchableWithoutFeedback style={{}} onPress={()=>this.changeIndex(3)}>
+                     <TouchableWithoutFeedback style={{}} onPress={()=>this.changeIndex(3,'newoutlet')}>
                       <View style={[{marginTop:20,backgroundColor:'#fff',marginHorizontal:25,borderRadius:10}]}>
                           <View style={{flexDirection:'row',paddingHorizontal:15,paddingVertical:20,}}>
                              <View style={{flex:0.4,}}>
@@ -442,13 +491,20 @@ getDashboard=async()=>{
                              </View>
                           </View>
                         {this.state.showArray[3].show&&
+                          <View>
+                          {this.state.outletData==null&&
+                            <View style={{height:100,alignItems:'center',justifyContent:'center'}}>
+                                <ActivityIndicator color={themeColor} size={'small'} />
+                            </View>
+                          }
+                        {this.state.outletData!=null&&
                           <View style={{}}>
                             <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
                                <View style={{flex:0.8,}}>
                                  <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Month Opening`}</Text>
                                </View>
                                <View style={{flex:0.2,alignItems:'flex-end'}}>
-                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>69</Text>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>{this.state.outletData.monthOpen}</Text>
                                </View>
                             </View>
                             <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
@@ -456,7 +512,7 @@ getDashboard=async()=>{
                                  <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`MTD Base`}</Text>
                                </View>
                                <View style={{flex:0.2,alignItems:'flex-end'}}>
-                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>72</Text>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>{this.state.outletData.MTDBase}</Text>
                                </View>
                             </View>
                             <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10}}>
@@ -464,7 +520,7 @@ getDashboard=async()=>{
                                  <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`New Outlets`}</Text>
                                </View>
                                <View style={{flex:0.2,alignItems:'flex-end'}}>
-                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>3</Text>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>{this.state.outletData.newOutlet}</Text>
                                </View>
                             </View>
                             <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:10}}>
@@ -472,7 +528,7 @@ getDashboard=async()=>{
                                  <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`New Outlets LM`}</Text>
                                </View>
                                <View style={{flex:0.2,alignItems:'flex-end'}}>
-                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>4</Text>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>{this.state.outletData.newOutletMTD}</Text>
                                </View>
                             </View>
                             <View style={{flexDirection:'row',paddingVertical:5,backgroundColor:'rgba(50, 96, 168,0.3)',paddingHorizontal:10,borderBottomLeftRadius:10,borderBottomRightRadius:10}}>
@@ -480,12 +536,14 @@ getDashboard=async()=>{
                                  <Text   style={{ color:'#000',fontWeight:'600',fontSize:14,}} numberOfLines={1}>{`Target TM`}</Text>
                                </View>
                                <View style={{flex:0.2,alignItems:'flex-end'}}>
-                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>75</Text>
+                                  <Text style={{ color:'#000',fontWeight:'600',fontSize:16,}} numberOfLines={1}>{this.state.outletData.monthOpen}</Text>
                                </View>
                             </View>
                           </View>
                         }
                       </View>
+                    }
+                    </View>
                     </TouchableWithoutFeedback>
                     }
 

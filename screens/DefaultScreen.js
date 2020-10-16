@@ -1,6 +1,6 @@
 
 import React, { Component }  from 'react';
-import {ActivityIndicator, Alert, ScrollView, StyleSheet, View,StatusBar, Text, TextInput, Picker, TouchableHighlight,TouchableOpacity, ImageBackground, Image,AsyncStorage,Keyboard,Linking,PermissionsAndroid,ToastAndroid,Dimensions} from 'react-native';
+import {ActivityIndicator, Alert, ScrollView, StyleSheet, View,StatusBar,TouchableWithoutFeedback, Text, TextInput, Picker, TouchableHighlight,TouchableOpacity, ImageBackground, Image,AsyncStorage,Keyboard,Linking,PermissionsAndroid,ToastAndroid,Dimensions} from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import Constants from 'expo-constants';
 import { FontAwesome,MaterialCommunityIcons } from '@expo/vector-icons';
@@ -12,6 +12,8 @@ import { connect } from 'react-redux';
 import * as actions from '../actions/index';
 import * as actionTypes from '../actions/actionTypes';
 import HttpsClient from '../helpers/HttpsClient';
+import * as Animatable from 'react-native-animatable';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 const { width,height } = Dimensions.get('window');
@@ -19,13 +21,29 @@ const SERVER_URL = settings.url
 const themeColor = settings.themeColor
 
 class DefaultScreen extends React.Component{
-
-
+  constructor(props) {
+    super(props);
+      this.state = {
+        loader:false,
+        firstTime:false
+      }
+}
+    check=async()=>{
+      const firstTime = await AsyncStorage.getItem('firstTime');
+      console.log(JSON.parse(firstTime),'JSON.parse(firstTime)JSON.parse(firstTime)');
+      if(JSON.parse(firstTime)==null){
+        this.setState({firstTime:true})
+        AsyncStorage.setItem('firstTime',JSON.stringify(false));
+      }else{
+        this.getUserDetails()
+      }
+    }
     componentDidMount=()=>{
-      this.getUserDetails()
+      this.check()
     }
 
      getUserDetails=async()=>{
+       this.setState({firstTime:false})
        console.log('cameeeeee');
        const login = await AsyncStorage.getItem("login")
 
@@ -44,12 +62,28 @@ class DefaultScreen extends React.Component{
          this.props.navigation.navigate('Login')
        }
      }
-
+   handleViewRef = ref => this.view = ref;
+   slideOutUp = () => this.view.slideOutUp().then(()=>this.getUserDetails())
 
     render(){
         return(
-          <View style={{flex:1,backgroundColor:"#e2e2e2",justifyContent:'center',alignItems:'center'}}>
-              <ActivityIndicator size={'large'} color={themeColor} />
+          <View style={{flex:1,backgroundColor:"#e2e2e2",}}>
+              {this.state.firstTime&&
+                <View style={{flex:1,}}>
+                <TouchableWithoutFeedback onPress={this.slideOutUp} style={{flex:1}}>
+                  <Animatable.View ref={this.handleViewRef} style={{flex:1,}}>
+                    <LinearGradient colors={['rgba(13,94,224,0.5)', 'rgba(6,56,138,1)']} style={{position:'absolute',top:0,right:0,left:0,bottom:0,}}>
+                        <Text style={{color:'#fff',fontSize:40,marginTop:height*0.4,textAlign:'center'}}>mAbler</Text>
+                    </LinearGradient>
+                  </Animatable.View>
+                </TouchableWithoutFeedback>
+                </View>
+              }
+              {!this.state.firstTime&&
+                <View style={{flex:1,backgroundColor:"#e2e2e2",justifyContent:'center',alignItems:'center'}}>
+                  <ActivityIndicator size={'large'} color={themeColor} />
+                </View>
+              }
           </View>
       );
     }
@@ -68,43 +102,3 @@ class DefaultScreen extends React.Component{
   }
 
   export default connect(mapStateToProps, mapDispatchToProps)(DefaultScreen);
-
-
-  //   const userToken = await AsyncStorage.getItem('userpk');
-  //   const sessionid = await AsyncStorage.getItem('sessionid');
-  //   const csrf = await AsyncStorage.getItem('csrf');
-  //   if(csrf!=null){
-  //     fetch(SERVER_URL + '/api/HR/users/?mode=mySelf&format=json', {
-  //       headers: {
-  //         "Cookie" :"csrftoken="+csrf+";sessionid=" + sessionid +";",
-  //         'Accept': 'application/json',
-  //         'Content-Type': 'application/json',
-  //         'Referer': URL,
-  //         'X-CSRFToken': csrf
-  //       },
-  //       method: 'GET'
-  //     })
-  //     .then((response) =>{
-  //       if (response.status !== 200) {
-  //         return;
-  //       }
-  //       else if(response.status == 200){
-  //         return response.json()
-  //       }
-  //     })
-  //     .then((responseJson) => {
-  //       responseJson[0].serverUrl = URL
-  //       this.props.setUserDetails(responseJson[0])
-  //       AsyncStorage.setItem('mobile',JSON.stringify(responseJson[0].profile.mobile));
-  //       this.props.navigation.navigate('Home')
-  //       return
-  //     })
-  //     .catch((error) => {
-  //       this.props.navigation.navigate('Login')
-  //     });
-  //   }else{
-  //     this.props.navigation.navigate('Login')
-  //   }
-  // }else{
-  //   this.props.navigation.navigate('Login')
-  // }

@@ -95,7 +95,7 @@ class Training extends React.Component {
   render() {
     return (
       <View style={{flex:1,backgroundColor:'#e2e2e2'}}>
-          <Headers navigation={this.props.navigation} name={'Training'} screen={'Training'}/>
+          <Headers navigation={this.props.navigation} name={'Training'} screen={'Training'} notificationBack={'Training'}/>
           {this.state.loader&&
             <Loader />
           }

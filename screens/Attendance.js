@@ -43,7 +43,7 @@ getAttendanceDetails=async()=>{
     this.setState({loader:true})
     var data = await HttpsClient.get(SERVER_URL + '/api/ERP/attendance/?today=true&user='+this.state.user.pk)
     if(data.type=='success'){
-        if(data.data.length>0){
+        if(data.data!=null&&data.data.length>0){
           this.props.setAttendance(data.data[0])
           this.props.navigation.navigate('Main')
           return

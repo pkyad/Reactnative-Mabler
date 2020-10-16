@@ -95,7 +95,7 @@ class Visits extends React.Component {
   render() {
     return (
       <View style={{flex:1,backgroundColor:'#e2e2e2'}}>
-          <Headers navigation={this.props.navigation} name={'My Visits'} screen={'Visits'}/>
+          <Headers navigation={this.props.navigation} name={'My Visits'} screen={'Visits'} notificationBack={'PageFirst'}/>
           <View style={{flex:1,}}>
             <View style={{paddingVertical:15,paddingBottom:5}}>
                 <Text style={{fontSize:18,color:'#000',fontWeight:'700',textAlign:'center'}}>{`Today's plan`} - {this.state.visitsCount} visits</Text>
