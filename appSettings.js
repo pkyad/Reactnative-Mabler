@@ -1,5 +1,5 @@
 const url = 'http://192.168.1.111:8000'
-// const url = 'https://mabler.cioc.in'
+// const url = 'https://mabler.in'
 // const themeColor = '#12318B'
 const themeColor = '#3260a8'
 const loginType = 'otp' // options are password

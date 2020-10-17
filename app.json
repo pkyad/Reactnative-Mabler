@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Cioc Mabler",
-    "slug": "Cioc-Mabler",
+    "name": "mAbler",
+    "slug": "mAbler",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,6 +11,8 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_ERROR_RECOVERY",
       "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": [
